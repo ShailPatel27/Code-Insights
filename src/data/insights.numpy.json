@@ -1,0 +1,247 @@
+{
+  "np.random.shuffle": {
+    "library": "numpy",
+    "qualifiedName": "np.random.shuffle",
+
+    "signature": "shuffle(x, axis=0)",
+
+    "description": "Randomly shuffles the elements of an array in-place.",
+
+    "attributes": [
+      {
+        "name": "x",
+        "role": "parameter",
+        "description": "The array or sequence to shuffle.",
+        "testable": true
+      },
+      {
+        "name": "axis",
+        "role": "parameter",
+        "description": "The axis along which to shuffle.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "None",
+        "description": "This function does not return a value."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "np.random.shuffle(arr)"
+      }
+    ],
+
+    "behavioralNotes": [
+      "Modifies the input array in place",
+      "Uses randomness; results are non-deterministic",
+      "Returns None"
+    ]
+  },
+
+  "np.random.permutation": {
+    "library": "numpy",
+    "qualifiedName": "np.random.permutation",
+
+    "signature": "permutation(x)",
+
+    "description": "Returns a randomly permuted copy of a sequence or array.",
+
+    "attributes": [
+      {
+        "name": "x",
+        "role": "parameter",
+        "description": "The input array or integer specifying the range to permute.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "ndarray",
+        "description": "A new array containing a random permutation of the input."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "shuffled = np.random.permutation(arr)"
+      }
+    ],
+
+    "behavioralNotes": [
+      "Does not modify the input array",
+      "Always returns a new array",
+      "Uses randomness; results are non-deterministic"
+    ]
+  },
+
+  "np.sort": {
+    "library": "numpy",
+    "qualifiedName": "np.sort",
+
+    "signature": "sort(a, axis=-1)",
+
+    "description": "Returns a sorted copy of an array.",
+
+    "attributes": [
+      {
+        "name": "a",
+        "role": "parameter",
+        "description": "The array to be sorted.",
+        "testable": true
+      },
+      {
+        "name": "axis",
+        "role": "parameter",
+        "description": "The axis along which to sort. Default is the last axis.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "ndarray",
+        "description": "A sorted copy of the input array."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "sorted_arr = np.sort(arr)"
+      }
+    ],
+
+    "behavioralNotes": [
+      "Does not modify the original array",
+      "Always returns a new array",
+      "Use ndarray.sort() for in-place sorting"
+    ]
+  },
+
+  "ndarray.sort": {
+    "library": "numpy",
+    "qualifiedName": "ndarray.sort",
+
+    "signature": "sort(axis=-1)",
+
+    "description": "Sorts the array in place along the specified axis.",
+
+    "attributes": [
+      {
+        "name": "axis",
+        "role": "parameter",
+        "description": "The axis along which to sort the array.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "None",
+        "description": "This method does not return a value."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "arr.sort()"
+      }
+    ],
+
+    "behavioralNotes": [
+      "Modifies the array in place",
+      "Returns None",
+      "Faster than np.sort when mutation is acceptable"
+    ]
+  },
+
+  "np.reshape": {
+    "library": "numpy",
+    "qualifiedName": "np.reshape",
+
+    "signature": "reshape(a, newshape)",
+
+    "description": "Gives a new shape to an array without changing its data.",
+
+    "attributes": [
+      {
+        "name": "a",
+        "role": "parameter",
+        "description": "The array to be reshaped.",
+        "testable": true
+      },
+      {
+        "name": "newshape",
+        "role": "parameter",
+        "description": "The new shape for the array.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "ndarray",
+        "description": "An array with the specified shape."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "reshaped = np.reshape(arr, (2, 3))"
+      }
+    ],
+
+    "behavioralNotes": [
+      "May return a view or a copy depending on memory layout",
+      "Does not modify the original array",
+      "No data is copied if a view is possible"
+    ]
+  },
+
+  "np.copy": {
+    "library": "numpy",
+    "qualifiedName": "np.copy",
+
+    "signature": "copy(a)",
+
+    "description": "Returns a shallow copy of an array.",
+
+    "attributes": [
+      {
+        "name": "a",
+        "role": "parameter",
+        "description": "The input array to copy.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "ndarray",
+        "description": "A new array containing a copy of the data."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "arr_copy = np.copy(arr)"
+      }
+    ],
+
+    "behavioralNotes": [
+      "Returns a new array",
+      "Shallow copy only (object references are shared)",
+      "Useful to avoid unintended in-place modification"
+    ]
+  }
+}
