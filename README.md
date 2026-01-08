@@ -53,7 +53,7 @@ Click **Learn More** to open a side panel with:
 - Usage examples
 - Behavioral notes
 
-### Test & 💬 Ask AI (Planned)
+### Test & Ask AI (Planned)
 The UI includes **Test** and **Ask AI** sections to show the future direction of the tool.
 
 In **v0.1**:
