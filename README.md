@@ -129,8 +129,8 @@ These features are intentionally **not** part of v0.1.
 
 ## Project Links
 
-- **Source Code:** https://github.com/<your-username>/code-insights
-- **Issues / Feedback:** https://github.com/<your-username>/code-insights/issues
+- **Source Code:** https://github.com/ShailPatel27/Code-Insights
+- **Issues / Feedback:** https://github.com/ShailPatel27/Code-Insights/issues
 
 
 ## Status
