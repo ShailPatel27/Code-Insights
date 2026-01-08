@@ -18,7 +18,7 @@ Quick, contextual explanations appear directly when hovering over a supported fu
 ### Learn More Sidebar
 Deeper, structured information is available in a persistent side panel.
 
-![Learn More Sidebar](/images/readme_image_1.png)
+![Learn More Sidebar](/images/readme_image_2.png)
 
 ---
 
@@ -61,6 +61,12 @@ In **v0.1**:
 - No code execution or AI calls are performed
 
 This is intentional and documented.
+
+---
+
+## Installation
+
+Install directly from the VS Code Marketplace by searching for **Code Insights**.
 
 ---
 
@@ -122,8 +128,6 @@ Future versions may include:
 - Expanded datasets and examples
 
 These features are intentionally **not** part of v0.1.
-
----
 
 ---
 
