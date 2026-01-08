@@ -30,7 +30,7 @@
     "url": "https://github.com/ShailPatel27/Code-Insights"
   },
   "homepage": "https://github.com/ShailPatel27/Code-Insights",
-  "publisher": "ShailPatel27",
+  "publisher": "shailpatel",
 
   "devDependencies": {
     "@types/vscode": "^1.107.0",
