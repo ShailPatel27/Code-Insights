@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { provideInsightHover } from './detection/functionResolver';
 
 let panel: vscode.WebviewPanel | undefined;
 
@@ -21,65 +22,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(hoverProvider);
-}
-
-function provideInsightHover(
-	document: vscode.TextDocument,
-	position: vscode.Position,
-	context: vscode.ExtensionContext
-): vscode.Hover | null {
-
-	const range = document.getWordRangeAtPosition(position);
-	if (!range) { return null; };
-
-	const word = document.getText(range);
-	const data = loadInsights(context);
-	if (!data) { return null; };
-
-	let key: string | null = null;
-	let entry: any = null;
-
-	for (const k of Object.keys(data)) {
-		if (k.endsWith(`.${word}`) || k === word) {
-			key = k;
-			entry = data[k];
-			break;
-		}
-	}
-
-	if (!key || !entry) { return null; };
-
-	const md = new vscode.MarkdownString(undefined, true);
-
-	md.isTrusted = true;
-
-	// md.appendMarkdown(`### $(lightbulb) Code Insights\n`);
-	md.appendMarkdown(`**${word.toUpperCase()}**  \n`);
-	md.appendMarkdown(`\`${key}\`\n\n`);
-
-	md.appendMarkdown(`$(lightbulb) **What it does**  \n`);
-	md.appendMarkdown(`${entry.description}\n\n`);
-
-	if (entry.behavioralNotes?.length) {
-		md.appendMarkdown(`$(warning) **Behavioral Notes**  \n`);
-		for (const note of entry.behavioralNotes) {
-			md.appendMarkdown(`• ${note}  \n`);
-		}
-	}
-
-
-	const learn = encodeURIComponent(JSON.stringify([key, 'learn']));
-	const test = encodeURIComponent(JSON.stringify([key, 'test']));
-	const ai = encodeURIComponent(JSON.stringify([key, 'ai']));
-	
-	md.appendMarkdown(`\n---\n`);
-	md.appendMarkdown(`### [\` Learn More \`](command:code-insights.open?${learn})  `);
-	md.appendMarkdown(`[\` Test \`](command:code-insights.open?${test})  `);
-	md.appendMarkdown(`[\` Ask AI \`](command:code-insights.open?${ai})`);
-
-
-
-	return new vscode.Hover(md);
 }
 
 function openPanel(
@@ -291,7 +233,7 @@ button {
 `;
 }
 
-function loadInsights(context: vscode.ExtensionContext): any | null {
+export function loadInsights(context: vscode.ExtensionContext): any | null {
 	try {
 		const file = path.join(context.extensionPath, 'src', 'data', 'insights.numpy.json');
 		return JSON.parse(fs.readFileSync(file, 'utf-8'));
