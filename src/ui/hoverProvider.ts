@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { loadInsights } from "../extension";
+import { loadInsights } from "../data/insightsLoader";
 
 
 
-function provideInsightHover(
+export function provideInsightHover(
     document: vscode.TextDocument,
     position: vscode.Position,
     context: vscode.ExtensionContext
@@ -60,4 +60,14 @@ function provideInsightHover(
 
 
     return new vscode.Hover(md);
+}
+
+export function registerHoverProvider(context: vscode.ExtensionContext) {
+    const hoverProvider = vscode.languages.registerHoverProvider('python', {
+        provideHover(document, position) {
+            return provideInsightHover(document, position, context);
+        }
+    });
+
+    context.subscriptions.push(hoverProvider);
 }
