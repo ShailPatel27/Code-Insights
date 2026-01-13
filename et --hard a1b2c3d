@@ -1,0 +1,8 @@
+[33m9aacad5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mv0.2[m[33m)[m refactor: created multiple new files
+[33m1603205[m refactor: extract functionResolver and hoverProvider from extension.ts
+[33md99aa19[m[33m ([m[1;31morigin/v0.2[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m updated package.json: final v0.1 change
+[33m6e0d170[m updated project gitignore
+[33m774c638[m updated readme links
+[33mafef037[m readme updated
+[33m438d597[m[33m ([m[1;33mtag: [m[1;33mv0.1.0[m[33m)[m Initial release: Code Insights v0.1.0
+[33mda2f5b5[m Initial commit

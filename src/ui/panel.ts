@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import { loadInsights } from "../data/insightsLoader";
-import { provideInsightHover } from '../detection/functionResolver';
+
 
 let panel: vscode.WebviewPanel | undefined;
 
@@ -15,15 +13,6 @@ export function registerPanel(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(disposable);
-
-	const hoverProvider = vscode.languages.registerHoverProvider('python', {
-		provideHover(document, position) {
-			return provideInsightHover(document, position, context);
-		}
-	});
-
-	context.subscriptions.push(hoverProvider);
-
 }
 
 export function buildPanelHtml(): string {
