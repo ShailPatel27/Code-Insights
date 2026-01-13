@@ -2,41 +2,21 @@ import * as vscode from 'vscode';
 import { loadInsights } from "../data/insightsLoader";
 import { resolveFunction } from "../detection/functionResolver";
 
-const USE_RESOLVER = true;
-
 export function provideInsightHover(
     document: vscode.TextDocument,
     position: vscode.Position,
     context: vscode.ExtensionContext
 ): vscode.Hover | null {
 
-    // const range = document.getWordRangeAtPosition(position);
-    // if (!range) { return null; };
+    const resolved = resolveFunction(document.getText(), position.line);
+    if (!resolved) { return null; };
 
-    // const word = document.getText(range);
     const data = loadInsights(context);
     if (!data) { return null; };
 
-    let key: string | null = null;
-    let entry: any = null;
-
-    if (USE_RESOLVER) {
-        const resolved = resolveFunction(document.getText(), position.line);
-        if (!resolved) { return null; };
-
-        key = resolved.key;
-        entry = data[key];
-    }
-    // else {
-    //     for (const k of Object.keys(data)) {
-    //         if (k.endsWith(`.${word}`) || k === word) {
-    //             key = k;
-    //             entry = data[k];
-    //             break;
-    //         }
-    //     }
-    // }
-
+    const key = resolved.key;
+    const entry = data[key];
+    if (!entry) {return null;};
 
     if (!key || !entry) { return null; };
 
@@ -60,7 +40,6 @@ export function provideInsightHover(
             md.appendMarkdown(`• ${note}  \n`);
         }
     }
-
 
     const learn = encodeURIComponent(JSON.stringify([key, 'learn']));
     const test = encodeURIComponent(JSON.stringify([key, 'test']));

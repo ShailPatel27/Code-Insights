@@ -2,6 +2,9 @@ export type ResolvedFunction = {
   key: string; // e.g. "np.random.shuffle"
 };
 
+
+// IMPORTANT: Order matters.
+// More specific patterns MUST come before generic ones.
 export function resolveFunction(
   documentText: string,
   lineNumber: number
