@@ -39,7 +39,7 @@ Official documentation often explains *what* a function does, but not always **h
 
 ---
 
-## Features (v0.2.0)
+## Features (v0.3.0)
 
 ### Smarter Hover Detection
 
@@ -61,6 +61,16 @@ Supports common NumPy usage patterns, including:
 
 This results in **more accurate and predictable hovers**.
 
+### Method Call Detection (New in v0.3.0)
+
+Code Insights now understands **method calls on NumPy arrays**, such as:
+
+* `arr.sort()`
+
+The extension infers the receiver type using simple assignment patterns (e.g. `arr = np.arange(...)`) and shows the correct behavioral insights when the type can be determined confidently.
+
+Ambiguous cases are intentionally ignored to avoid misleading information.
+
 ### Learn More Sidebar
 
 Click **Learn More** to open a side panel with:
@@ -75,7 +85,7 @@ Click **Learn More** to open a side panel with:
 
 The UI includes **Test** and **Ask AI** sections to show the future direction of the tool.
 
-In **v0.2.0**:
+In **v0.3.0**:
 
 * These sections display **“Coming soon”**
 * No code execution or AI calls are performed
@@ -145,12 +155,12 @@ The extension aims to **explain behavior**, not replace documentation or debuggi
 
 Future versions may include:
 
-* Method call detection (e.g. `arr.sort()`)
+* Expanded method support beyond NumPy ndarrays
 * Support for additional libraries (pandas, built-ins, etc.)
 * Attribute-level interactive testing
 * AI-assisted explanations
 
-These features are intentionally **not part of v0.2.0**.
+These features are intentionally **not part of v0.3.0**.
 
 ---
 
@@ -170,8 +180,8 @@ These features are intentionally **not part of v0.2.0**.
 
 ## Status
 
-**Version:** v0.2.0
-**Stage:** Early development (learning + correctness focused)
+**Version:** v0.3.0
+**Stage:** Early development (resolver-driven, learning + correctness focused)
 
 This release introduces smarter function detection and establishes a solid foundation for future expansion.
 
