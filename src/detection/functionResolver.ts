@@ -1,5 +1,3 @@
-import * as vscode from 'vscode';
-
 export type ResolvedFunction = {
   key: string; // e.g. "np.random.shuffle"
 };
