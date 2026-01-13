@@ -4,18 +4,20 @@
 
 Instead of switching to documentation, it provides **inline explanations, behavioral notes, and structured insights** through hover tooltips and a sidebar.
 
-This project focuses on **learning and correctness**, not execution.
+This extension focuses on **learning and correctness**, not execution.
 
 ---
 
 ## In Action
 
 ### Hover Insights
+
 Quick, contextual explanations appear directly when hovering over a supported function.
 
 ![Hover Insights](images/readme_image_1.png)
 
 ### Learn More Sidebar
+
 Deeper, structured information is available in a persistent side panel.
 
 ![Learn More Sidebar](/images/readme_image_2.png)
@@ -26,10 +28,10 @@ Deeper, structured information is available in a persistent side panel.
 
 Many bugs (especially for learners) come from misunderstandings such as:
 
-- Does this function modify data in place?
-- Does it return a new object or `None`?
-- Why do two similarly named APIs behave differently?
-- What are the practical side effects of calling this function?
+* Does this function modify data in place?
+* Does it return a new object or `None`?
+* Why do two similarly named APIs behave differently?
+* What are the practical side effects of calling this function?
 
 Official documentation often explains *what* a function does, but not always **how it behaves in practice**.
 
@@ -37,28 +39,46 @@ Official documentation often explains *what* a function does, but not always **h
 
 ---
 
-## Features (v0.1)
+## Features (v0.2.0)
 
-### Hover Insights
-Hover over a supported function to see:
-- A short description
-- Key behavioral notes (e.g. in-place mutation, return value)
-- Quick navigation actions (Learn More, Test, Ask AI)
+### Smarter Hover Detection
+
+Hover insights are now shown **only for real function calls**, not for:
+
+* strings
+* comments
+* variable names
+
+The extension resolves functions based on **import context**, not simple word matching.
+
+### NumPy Import Awareness
+
+Supports common NumPy usage patterns, including:
+
+* `np.random.shuffle(arr)`
+* custom aliases (e.g. `import numpy as nump`)
+* `from numpy.random import shuffle`
+
+This results in **more accurate and predictable hovers**.
 
 ### Learn More Sidebar
+
 Click **Learn More** to open a side panel with:
-- Function signature
-- Clear description
-- Main parameters (attributes)
-- Usage examples
-- Behavioral notes
+
+* Function signature
+* Clear description
+* Main parameters (attributes)
+* Usage examples
+* Behavioral notes
 
 ### Test & Ask AI (Planned)
+
 The UI includes **Test** and **Ask AI** sections to show the future direction of the tool.
 
-In **v0.1**:
-- These sections display **“Coming soon”**
-- No code execution or AI calls are performed
+In **v0.2.0**:
+
+* These sections display **“Coming soon”**
+* No code execution or AI calls are performed
 
 This is intentional and documented.
 
@@ -72,20 +92,21 @@ Install directly from the VS Code Marketplace by searching for **Code Insights**
 
 ## Currently Supported Functions
 
-This MVP focuses on a small, carefully chosen set of NumPy APIs:
+This version focuses on a small, carefully curated set of NumPy APIs:
 
-- `np.random.shuffle`
-- `np.random.permutation`
-- `np.sort`
-- `ndarray.sort`
-- `np.reshape`
-- `np.copy`
+* `np.random.shuffle`
+* `np.random.permutation`
+* `np.sort`
+* `ndarray.sort`
+* `np.reshape`
+* `np.copy`
 
 Each function includes:
-- Parameter-level explanations
-- Mutation vs non-mutation behavior
-- Return semantics
-- Simple usage examples
+
+* Parameter-level explanations
+* Mutation vs non-mutation behavior
+* Return semantics
+* Simple usage examples
 
 The data is defined using a structured JSON schema, making it easy to extend.
 
@@ -93,27 +114,28 @@ The data is defined using a structured JSON schema, making it easy to extend.
 
 ## How It Works
 
-- The extension uses **static, curated metadata** (JSON) for known functions
-- It does **not** analyze or execute your code
-- Hover detection is heuristic-based (name matching)
-- The sidebar is a single persistent panel with internal navigation
+* The extension uses **static, curated metadata** (JSON)
+* It does **not** analyze or execute your code
+* Function detection is **resolver-based**, using import context
+* The sidebar is a single persistent panel with internal navigation
 
 This keeps the extension:
-- fast
-- predictable
-- safe to use in any project
+
+* fast
+* predictable
+* safe to use in any project
 
 ---
 
 ## Limitations
 
-This is an **MVP**. By design:
+This is still an **early-stage project**. By design:
 
-- No code execution
-- No runtime inspection
-- No AI responses yet
-- No full semantic analysis
-- Limited function coverage
+* No code execution
+* No runtime inspection
+* No AI responses yet
+* No full semantic analysis
+* Limited function coverage
 
 The extension aims to **explain behavior**, not replace documentation or debugging tools.
 
@@ -122,27 +144,36 @@ The extension aims to **explain behavior**, not replace documentation or debuggi
 ## Planned Improvements
 
 Future versions may include:
-- Attribute-level interactive testing
-- AI-powered explanations for custom code
-- Support for more libraries (pandas, Python built-ins, etc.)
-- Expanded datasets and examples
 
-These features are intentionally **not** part of v0.1.
+* Method call detection (e.g. `arr.sort()`)
+* Support for additional libraries (pandas, built-ins, etc.)
+* Attribute-level interactive testing
+* AI-assisted explanations
+
+These features are intentionally **not part of v0.2.0**.
+
+---
+
+## Project & Branding
+
+**Code Insights** is developed under **Lenex**
+🌐 [https://lenex.dev](https://lenex.dev)
 
 ---
 
 ## Project Links
 
-- **Source Code:** https://github.com/ShailPatel27/Code-Insights
-- **Issues / Feedback:** https://github.com/ShailPatel27/Code-Insights/issues
+* **Source Code:** [https://github.com/ShailPatel27/Code-Insights](https://github.com/ShailPatel27/Code-Insights)
+* **Issues / Feedback:** [https://github.com/ShailPatel27/Code-Insights/issues](https://github.com/ShailPatel27/Code-Insights/issues)
 
+---
 
 ## Status
 
-**Version:** v0.1  
-**Stage:** MVP (learning + exploration focused)
+**Version:** v0.2.0
+**Stage:** Early development (learning + correctness focused)
 
-This is the first published version of the project and serves as a foundation for future work.
+This release introduces smarter function detection and establishes a solid foundation for future expansion.
 
 ---
 
