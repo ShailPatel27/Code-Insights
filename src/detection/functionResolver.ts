@@ -11,17 +11,17 @@ export function resolveFunction(
   const { aliasMap, directMap } = parseImports(lines);
 
   const line = lines[lineNumber];
-  if (!line) {return null;};
+  if (!line) { return null; };
 
   // case 1: np.random.shuffle(...)
   let m = line.match(/(\w+)\.(\w+)\.(\w+)\s*\(/);
   if (m) {
     const alias = m[1];
     const module = aliasMap.get(alias);
-    if (!module) {return null;};
+    if (!module) { return null; };
 
     return {
-      key: `${alias}.${m[2]}.${m[3]}`
+      key: `np.${m[2]}.${m[3]}`
     };
   }
 
@@ -30,7 +30,7 @@ export function resolveFunction(
   if (m) {
     const fn = m[1];
     const full = directMap.get(fn);
-    if (!full) {return null;};
+    if (!full) { return null; };
 
     // convert numpy.random.shuffle → np.random.shuffle
     return {
