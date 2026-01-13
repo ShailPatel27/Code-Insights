@@ -10,10 +10,10 @@ export function provideInsightHover(
     context: vscode.ExtensionContext
 ): vscode.Hover | null {
 
-    const range = document.getWordRangeAtPosition(position);
-    if (!range) { return null; };
+    // const range = document.getWordRangeAtPosition(position);
+    // if (!range) { return null; };
 
-    const word = document.getText(range);
+    // const word = document.getText(range);
     const data = loadInsights(context);
     if (!data) { return null; };
 
@@ -27,15 +27,15 @@ export function provideInsightHover(
         key = resolved.key;
         entry = data[key];
     }
-    else {
-        for (const k of Object.keys(data)) {
-            if (k.endsWith(`.${word}`) || k === word) {
-                key = k;
-                entry = data[k];
-                break;
-            }
-        }
-    }
+    // else {
+    //     for (const k of Object.keys(data)) {
+    //         if (k.endsWith(`.${word}`) || k === word) {
+    //             key = k;
+    //             entry = data[k];
+    //             break;
+    //         }
+    //     }
+    // }
 
 
     if (!key || !entry) { return null; };
@@ -45,7 +45,10 @@ export function provideInsightHover(
     md.isTrusted = true;
 
     // md.appendMarkdown(`### $(lightbulb) Code Insights\n`);
-    md.appendMarkdown(`**${word.toUpperCase()}**  \n`);
+    // md.appendMarkdown(`**${word.toUpperCase()}**  \n`);
+    const displayName = key.split('.').pop() ?? key;
+    md.appendMarkdown(`**${displayName.toUpperCase()}**  \n`);
+
     md.appendMarkdown(`\`${key}\`\n\n`);
 
     md.appendMarkdown(`$(lightbulb) **What it does**  \n`);
