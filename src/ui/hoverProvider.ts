@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { loadInsights } from "../data/insightsLoader";
 import { resolveFunction } from "../detection/functionResolver";
 
-const USE_RESOLVER = false;
+const USE_RESOLVER = true;
 
 export function provideInsightHover(
     document: vscode.TextDocument,
