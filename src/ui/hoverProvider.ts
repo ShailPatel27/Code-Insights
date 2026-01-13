@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { loadInsights } from "../data/insightsLoader";
+import { resolveFunction } from "../detection/functionResolver";
 
-
+const USE_RESOLVER = false;
 
 export function provideInsightHover(
     document: vscode.TextDocument,
@@ -19,13 +20,23 @@ export function provideInsightHover(
     let key: string | null = null;
     let entry: any = null;
 
-    for (const k of Object.keys(data)) {
-        if (k.endsWith(`.${word}`) || k === word) {
-            key = k;
-            entry = data[k];
-            break;
+    if (USE_RESOLVER) {
+        const resolved = resolveFunction(document.getText(), position.line);
+        if (!resolved) { return null; };
+
+        key = resolved.key;
+        entry = data[key];
+    }
+    else {
+        for (const k of Object.keys(data)) {
+            if (k.endsWith(`.${word}`) || k === word) {
+                key = k;
+                entry = data[k];
+                break;
+            }
         }
     }
+
 
     if (!key || !entry) { return null; };
 
@@ -51,7 +62,7 @@ export function provideInsightHover(
     const learn = encodeURIComponent(JSON.stringify([key, 'learn']));
     const test = encodeURIComponent(JSON.stringify([key, 'test']));
     const ai = encodeURIComponent(JSON.stringify([key, 'ai']));
-    
+
     md.appendMarkdown(`\n---\n`);
     md.appendMarkdown(`### [\` Learn More \`](command:code-insights.open?${learn})  `);
     md.appendMarkdown(`[\` Test \`](command:code-insights.open?${test})  `);
