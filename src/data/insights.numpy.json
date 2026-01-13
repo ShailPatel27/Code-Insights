@@ -2,9 +2,7 @@
   "np.random.shuffle": {
     "library": "numpy",
     "qualifiedName": "np.random.shuffle",
-
     "signature": "shuffle(x, axis=0)",
-
     "description": "Randomly shuffles the elements of an array in-place.",
 
     "attributes": [
@@ -43,21 +41,41 @@
     ],
 
     "test": {
-      "scenario": "Demonstrates how shuffle modifies the input array in place.",
-      "initialState": "arr = [1, 2, 3, 4]",
-      "code": "np.random.shuffle(arr)",
-      "observations": [
-        "The input array is modified in place",
-        "The order of elements changes",
-        "The length of the array remains the same"
+      "mode": "guided",
+      "runLabel": "Run Code",
+
+      "editorCode": [
+        "import numpy as np",
+        "",
+        "arr = [1, 2, 3, 4]",
+        "",
+        "# Shuffle the array",
+        "np.random.shuffle(arr)",
+        "",
+        "# Inspect the array after shuffling",
+        "print(arr)"
       ],
-      "guarantees": [
-        "Elements are preserved",
-        "Operation is in-place"
+
+      "explanations": [
+        {
+          "line": 3,
+          "text": "We start with a simple list so changes are easy to observe."
+        },
+        {
+          "line": 6,
+          "text": "shuffle modifies the original array instead of creating a new one."
+        },
+        {
+          "line": 9,
+          "text": "The order will change, but the elements themselves remain the same."
+        }
       ],
-      "nonGuarantees": [
-        "Specific output order",
-        "Reproducibility without a random seed"
+
+      "output": [
+        "The array order changes after shuffle.",
+        "The original array object is modified in place.",
+        "The number of elements remains the same.",
+        "The exact order is not guaranteed without a random seed."
       ]
     }
   },
@@ -65,9 +83,7 @@
   "np.random.permutation": {
     "library": "numpy",
     "qualifiedName": "np.random.permutation",
-
     "signature": "permutation(x)",
-
     "description": "Returns a randomly permuted copy of a sequence or array.",
 
     "attributes": [
@@ -100,21 +116,36 @@
     ],
 
     "test": {
-      "scenario": "Demonstrates that permutation returns a new shuffled array.",
-      "initialState": "arr = [1, 2, 3, 4]",
-      "code": "shuffled = np.random.permutation(arr)",
-      "observations": [
-        "The original array is not modified",
-        "A new array is returned",
-        "The returned array has the same elements"
+      "mode": "guided",
+      "runLabel": "Run Code",
+
+      "editorCode": [
+        "import numpy as np",
+        "",
+        "arr = [1, 2, 3, 4]",
+        "",
+        "shuffled = np.random.permutation(arr)",
+        "",
+        "print(arr)",
+        "print(shuffled)"
       ],
-      "guarantees": [
-        "Original input remains unchanged",
-        "Returned array is a new object"
+
+      "explanations": [
+        {
+          "line": 3,
+          "text": "The original array is defined once and reused."
+        },
+        {
+          "line": 5,
+          "text": "permutation creates a new array instead of modifying the input."
+        }
       ],
-      "nonGuarantees": [
-        "Specific output order",
-        "Reproducibility without a random seed"
+
+      "output": [
+        "The original array remains unchanged.",
+        "A new array is created with shuffled elements.",
+        "Both arrays contain the same elements.",
+        "The order of the returned array is not guaranteed."
       ]
     }
   },
@@ -122,9 +153,7 @@
   "np.sort": {
     "library": "numpy",
     "qualifiedName": "np.sort",
-
     "signature": "sort(a, axis=-1)",
-
     "description": "Returns a sorted copy of an array.",
 
     "attributes": [
@@ -137,7 +166,7 @@
       {
         "name": "axis",
         "role": "parameter",
-        "description": "The axis along which to sort. Default is the last axis.",
+        "description": "The axis along which to sort.",
         "testable": true
       }
     ],
@@ -158,24 +187,39 @@
 
     "behavioralNotes": [
       "Does not modify the original array",
-      "Always returns a new array",
-      "Use ndarray.sort() for in-place sorting"
+      "Always returns a new array"
     ],
 
     "test": {
-      "scenario": "Demonstrates that np.sort returns a sorted copy.",
-      "initialState": "arr = [3, 1, 2]",
-      "code": "sorted_arr = np.sort(arr)",
-      "observations": [
-        "The original array is not modified",
-        "A new sorted array is returned"
+      "mode": "guided",
+      "runLabel": "Run Code",
+
+      "editorCode": [
+        "import numpy as np",
+        "",
+        "arr = [3, 1, 2]",
+        "",
+        "sorted_arr = np.sort(arr)",
+        "",
+        "print(arr)",
+        "print(sorted_arr)"
       ],
-      "guarantees": [
-        "Returned array is sorted",
-        "Original input remains unchanged"
+
+      "explanations": [
+        {
+          "line": 3,
+          "text": "The input array is defined once."
+        },
+        {
+          "line": 5,
+          "text": "np.sort returns a new sorted array."
+        }
       ],
-      "nonGuarantees": [
-        "In-place sorting behavior"
+
+      "output": [
+        "The original array remains unchanged.",
+        "A new array is returned in sorted order.",
+        "Sorting does not occur in place."
       ]
     }
   },
@@ -183,16 +227,14 @@
   "ndarray.sort": {
     "library": "numpy",
     "qualifiedName": "ndarray.sort",
-
     "signature": "sort(axis=-1)",
-
     "description": "Sorts the array in place along the specified axis.",
 
     "attributes": [
       {
         "name": "axis",
         "role": "parameter",
-        "description": "The axis along which to sort the array.",
+        "description": "The axis along which to sort.",
         "testable": true
       }
     ],
@@ -213,84 +255,32 @@
 
     "behavioralNotes": [
       "Modifies the array in place",
-      "Returns None",
-      "Faster than np.sort when mutation is acceptable"
+      "Returns None"
     ],
 
     "test": {
-      "scenario": "Demonstrates in-place sorting of an array.",
-      "initialState": "arr = [3, 1, 2]",
-      "code": "arr.sort()",
-      "observations": [
-        "The array is modified in place",
-        "Elements are reordered into sorted order"
+      "mode": "guided",
+      "runLabel": "Run Code",
+
+      "editorCode": [
+        "arr = [3, 1, 2]",
+        "",
+        "arr.sort()",
+        "",
+        "print(arr)"
       ],
-      "guarantees": [
-        "Array contents are sorted",
-        "Operation modifies the original array"
+
+      "explanations": [
+        {
+          "line": 2,
+          "text": "The sort method operates directly on the array."
+        }
       ],
-      "nonGuarantees": [
-        "Returning a new array"
-      ]
-    }
-  },
 
-  "np.reshape": {
-    "library": "numpy",
-    "qualifiedName": "np.reshape",
-
-    "signature": "reshape(a, newshape)",
-
-    "description": "Gives a new shape to an array without changing its data.",
-
-    "attributes": [
-      {
-        "name": "a",
-        "role": "parameter",
-        "description": "The array to be reshaped.",
-        "testable": true
-      },
-      {
-        "name": "newshape",
-        "role": "parameter",
-        "description": "The new shape for the array.",
-        "testable": true
-      }
-    ],
-
-    "returns": [
-      {
-        "name": "ndarray",
-        "description": "An array with the specified shape."
-      }
-    ],
-
-    "usage": [
-      {
-        "title": "Basic Usage",
-        "code": "reshaped = np.reshape(arr, (2, 3))"
-      }
-    ],
-
-    "behavioralNotes": [
-      "May return a view or a copy depending on memory layout",
-      "Does not modify the original array",
-      "No data is copied if a view is possible"
-    ],
-
-    "test": {
-      "scenario": "Demonstrates reshaping without changing underlying data.",
-      "initialState": "arr = [1, 2, 3, 4, 5, 6]",
-      "code": "reshaped = np.reshape(arr, (2, 3))",
-      "observations": [
-        "The shape of the array changes",
-        "The original array remains unchanged"
-      ],
-      "guarantees": [
-        "Data values are preserved"
-      ],
-      "nonGuarantees": [
-        "Returning a copy instead of a view"
+      "output": [
+        "The original array is modified in place.",
+        "Elements are reordered into sorted order.",
+        "No new array is created."
       ]
     }
   },
@@ -298,9 +288,7 @@
   "np.copy": {
     "library": "numpy",
     "qualifiedName": "np.copy",
-
     "signature": "copy(a)",
-
     "description": "Returns a shallow copy of an array.",
 
     "attributes": [
@@ -328,23 +316,35 @@
 
     "behavioralNotes": [
       "Returns a new array",
-      "Shallow copy only (object references are shared)",
-      "Useful to avoid unintended in-place modification"
+      "Performs a shallow copy"
     ],
 
     "test": {
-      "scenario": "Demonstrates creation of a shallow copy.",
-      "initialState": "arr = [1, 2, 3]",
-      "code": "arr_copy = np.copy(arr)",
-      "observations": [
-        "A new array object is created",
-        "Data values are duplicated"
+      "mode": "guided",
+      "runLabel": "Run Code",
+
+      "editorCode": [
+        "import numpy as np",
+        "",
+        "arr = [1, 2, 3]",
+        "",
+        "arr_copy = np.copy(arr)",
+        "",
+        "print(arr)",
+        "print(arr_copy)"
       ],
-      "guarantees": [
-        "Returned array is a new object"
+
+      "explanations": [
+        {
+          "line": 5,
+          "text": "np.copy creates a new array with duplicated data."
+        }
       ],
-      "nonGuarantees": [
-        "Deep copy of nested objects"
+
+      "output": [
+        "A new array object is created.",
+        "The original array remains unchanged.",
+        "Only a shallow copy is performed."
       ]
     }
   }
