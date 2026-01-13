@@ -8,6 +8,8 @@ export function resolveFunction(
 ): ResolvedFunction | null {
   const lines = documentText.split("\n");
 
+  const variableTypes = inferVariableTypes(lines);
+
   const { aliasMap, directMap } = parseImports(lines);
 
   const line = lines[lineNumber];
@@ -25,7 +27,21 @@ export function resolveFunction(
     };
   }
 
-  // case 2: shuffle(...)
+  // case 2: method call → obj.method(...)
+  m = line.match(/(\w+)\.(\w+)\s*\(/);
+  if (m) {
+    const objectName = m[1];
+    const methodName = m[2];
+
+    const receiverType = variableTypes.get(objectName);
+    if (!receiverType) { return null; };
+
+    return {
+      key: `${receiverType}.${methodName}`
+    };
+  }
+
+  // case 3: shuffle(...)
   m = line.match(/(\w+)\s*\(/);
   if (m) {
     const fn = m[1];
@@ -35,17 +51,6 @@ export function resolveFunction(
     // convert numpy.random.shuffle → np.random.shuffle
     return {
       key: `np.${full.replace(/^numpy\./, "")}`
-    };
-  }
-
-  // case 3: method call → obj.method(...)
-  m = line.match(/(\w+)\.(\w+)\s*\(/);
-  if (m) {
-    const objectName = m[1];
-    const methodName = m[2];
-
-    return {
-      key: `__METHOD__:${objectName}.${methodName}`
     };
   }
 
@@ -83,4 +88,28 @@ function parseImports(lines: string[]) {
   }
 
   return { aliasMap, directMap };
+}
+
+function inferVariableTypes(lines: string[]) {
+  const types = new Map<string, string>();
+
+  for (const line of lines) {
+    let m;
+
+    // arr = np.array(...)
+    m = line.match(/(\w+)\s*=\s*\w+\.array\s*\(/);
+    if (m) {
+      types.set(m[1], "ndarray");
+      continue;
+    }
+
+    // arr = np.arange(...)
+    m = line.match(/(\w+)\s*=\s*\w+\.arange\s*\(/);
+    if (m) {
+      types.set(m[1], "ndarray");
+      continue;
+    }
+  }
+
+  return types;
 }
