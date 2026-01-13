@@ -38,6 +38,17 @@ export function resolveFunction(
     };
   }
 
+  // case 3: method call → obj.method(...)
+  m = line.match(/(\w+)\.(\w+)\s*\(/);
+  if (m) {
+    const objectName = m[1];
+    const methodName = m[2];
+
+    return {
+      key: `__METHOD__:${objectName}.${methodName}`
+    };
+  }
+
   return null;
 }
 
