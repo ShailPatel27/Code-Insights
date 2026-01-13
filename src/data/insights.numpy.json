@@ -40,7 +40,26 @@
       "Modifies the input array in place",
       "Uses randomness; results are non-deterministic",
       "Returns None"
-    ]
+    ],
+
+    "test": {
+      "scenario": "Demonstrates how shuffle modifies the input array in place.",
+      "initialState": "arr = [1, 2, 3, 4]",
+      "code": "np.random.shuffle(arr)",
+      "observations": [
+        "The input array is modified in place",
+        "The order of elements changes",
+        "The length of the array remains the same"
+      ],
+      "guarantees": [
+        "Elements are preserved",
+        "Operation is in-place"
+      ],
+      "nonGuarantees": [
+        "Specific output order",
+        "Reproducibility without a random seed"
+      ]
+    }
   },
 
   "np.random.permutation": {
@@ -78,7 +97,26 @@
       "Does not modify the input array",
       "Always returns a new array",
       "Uses randomness; results are non-deterministic"
-    ]
+    ],
+
+    "test": {
+      "scenario": "Demonstrates that permutation returns a new shuffled array.",
+      "initialState": "arr = [1, 2, 3, 4]",
+      "code": "shuffled = np.random.permutation(arr)",
+      "observations": [
+        "The original array is not modified",
+        "A new array is returned",
+        "The returned array has the same elements"
+      ],
+      "guarantees": [
+        "Original input remains unchanged",
+        "Returned array is a new object"
+      ],
+      "nonGuarantees": [
+        "Specific output order",
+        "Reproducibility without a random seed"
+      ]
+    }
   },
 
   "np.sort": {
@@ -122,7 +160,24 @@
       "Does not modify the original array",
       "Always returns a new array",
       "Use ndarray.sort() for in-place sorting"
-    ]
+    ],
+
+    "test": {
+      "scenario": "Demonstrates that np.sort returns a sorted copy.",
+      "initialState": "arr = [3, 1, 2]",
+      "code": "sorted_arr = np.sort(arr)",
+      "observations": [
+        "The original array is not modified",
+        "A new sorted array is returned"
+      ],
+      "guarantees": [
+        "Returned array is sorted",
+        "Original input remains unchanged"
+      ],
+      "nonGuarantees": [
+        "In-place sorting behavior"
+      ]
+    }
   },
 
   "ndarray.sort": {
@@ -160,7 +215,24 @@
       "Modifies the array in place",
       "Returns None",
       "Faster than np.sort when mutation is acceptable"
-    ]
+    ],
+
+    "test": {
+      "scenario": "Demonstrates in-place sorting of an array.",
+      "initialState": "arr = [3, 1, 2]",
+      "code": "arr.sort()",
+      "observations": [
+        "The array is modified in place",
+        "Elements are reordered into sorted order"
+      ],
+      "guarantees": [
+        "Array contents are sorted",
+        "Operation modifies the original array"
+      ],
+      "nonGuarantees": [
+        "Returning a new array"
+      ]
+    }
   },
 
   "np.reshape": {
@@ -204,7 +276,23 @@
       "May return a view or a copy depending on memory layout",
       "Does not modify the original array",
       "No data is copied if a view is possible"
-    ]
+    ],
+
+    "test": {
+      "scenario": "Demonstrates reshaping without changing underlying data.",
+      "initialState": "arr = [1, 2, 3, 4, 5, 6]",
+      "code": "reshaped = np.reshape(arr, (2, 3))",
+      "observations": [
+        "The shape of the array changes",
+        "The original array remains unchanged"
+      ],
+      "guarantees": [
+        "Data values are preserved"
+      ],
+      "nonGuarantees": [
+        "Returning a copy instead of a view"
+      ]
+    }
   },
 
   "np.copy": {
@@ -242,6 +330,22 @@
       "Returns a new array",
       "Shallow copy only (object references are shared)",
       "Useful to avoid unintended in-place modification"
-    ]
+    ],
+
+    "test": {
+      "scenario": "Demonstrates creation of a shallow copy.",
+      "initialState": "arr = [1, 2, 3]",
+      "code": "arr_copy = np.copy(arr)",
+      "observations": [
+        "A new array object is created",
+        "Data values are duplicated"
+      ],
+      "guarantees": [
+        "Returned array is a new object"
+      ],
+      "nonGuarantees": [
+        "Deep copy of nested objects"
+      ]
+    }
   }
 }
