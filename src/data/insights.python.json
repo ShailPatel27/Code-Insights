@@ -1,0 +1,208 @@
+{
+  "python.sorted": {
+    "library": "python",
+    "qualifiedName": "sorted",
+    "signature": "sorted(iterable, key=None, reverse=False)",
+    "description": "Returns a new sorted list from the items in an iterable.",
+
+    "attributes": [
+      {
+        "name": "iterable",
+        "role": "parameter",
+        "description": "The values to sort.",
+        "testable": true
+      },
+      {
+        "name": "reverse",
+        "role": "parameter",
+        "description": "When true, sorts the result in descending order.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "list",
+        "description": "A new list containing the sorted values."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "ordered = sorted(items)"
+      }
+    ],
+
+    "behavioralNotes": [
+      "Does not modify the original iterable",
+      "Always returns a new list",
+      "Useful when you need to preserve the original order"
+    ],
+
+    "test": {
+      "mode": "guided",
+      "runLabel": "Run Code",
+
+      "editorCode": [
+        "items = [3, 1, 2]",
+        "",
+        "ordered = sorted(items)",
+        "",
+        "print(items)",
+        "print(ordered)"
+      ],
+
+      "explanations": [
+        {
+          "line": 1,
+          "text": "The original list starts in unsorted order."
+        },
+        {
+          "line": 3,
+          "text": "sorted creates a new list instead of changing items."
+        }
+      ],
+
+      "output": [
+        "The original list remains [3, 1, 2].",
+        "The returned list is [1, 2, 3].",
+        "Use list.sort() when you intentionally want in-place sorting."
+      ]
+    }
+  },
+
+  "python.len": {
+    "library": "python",
+    "qualifiedName": "len",
+    "signature": "len(obj)",
+    "description": "Returns the number of items in a container.",
+
+    "attributes": [
+      {
+        "name": "obj",
+        "role": "parameter",
+        "description": "The container or sequence to measure.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "int",
+        "description": "The number of items in the object."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "count = len(items)"
+      }
+    ],
+
+    "behavioralNotes": [
+      "Does not modify the input object",
+      "Returns an integer",
+      "Usually runs in constant time for built-in containers"
+    ],
+
+    "test": {
+      "mode": "guided",
+      "runLabel": "Run Code",
+
+      "editorCode": [
+        "items = [10, 20, 30]",
+        "",
+        "count = len(items)",
+        "",
+        "print(items)",
+        "print(count)"
+      ],
+
+      "explanations": [
+        {
+          "line": 1,
+          "text": "The list contains three values."
+        },
+        {
+          "line": 3,
+          "text": "len reads the container size and returns it as an integer."
+        }
+      ],
+
+      "output": [
+        "The original list is unchanged.",
+        "The returned value is 3.",
+        "len reports size; it does not inspect or transform the contents."
+      ]
+    }
+  },
+
+  "list.sort": {
+    "library": "python",
+    "qualifiedName": "list.sort",
+    "signature": "sort(key=None, reverse=False)",
+    "description": "Sorts a list in place.",
+
+    "attributes": [
+      {
+        "name": "reverse",
+        "role": "parameter",
+        "description": "When true, sorts the list in descending order.",
+        "testable": true
+      }
+    ],
+
+    "returns": [
+      {
+        "name": "None",
+        "description": "This method does not return the sorted list."
+      }
+    ],
+
+    "usage": [
+      {
+        "title": "Basic Usage",
+        "code": "items.sort()"
+      }
+    ],
+
+    "behavioralNotes": [
+      "Modifies the list in place",
+      "Returns None",
+      "Use sorted(items) when you need a new list"
+    ],
+
+    "test": {
+      "mode": "guided",
+      "runLabel": "Run Code",
+
+      "editorCode": [
+        "items = [3, 1, 2]",
+        "",
+        "result = items.sort()",
+        "",
+        "print(items)",
+        "print(result)"
+      ],
+
+      "explanations": [
+        {
+          "line": 1,
+          "text": "The original list starts in unsorted order."
+        },
+        {
+          "line": 3,
+          "text": "list.sort changes the original list and returns None."
+        }
+      ],
+
+      "output": [
+        "The original list becomes [1, 2, 3].",
+        "The result variable is None.",
+        "This is a common source of bugs when assigning the result of sort."
+      ]
+    }
+  }
+}

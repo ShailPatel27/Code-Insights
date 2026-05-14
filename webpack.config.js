@@ -3,9 +3,29 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 
 //@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
+
+class CopyInsightsDataPlugin {
+  apply(compiler) {
+    compiler.hooks.afterEmit.tap('CopyInsightsDataPlugin', () => {
+      const sourceDir = path.resolve(__dirname, 'src', 'data');
+      const targetDir = path.resolve(__dirname, 'dist', 'data');
+
+      fs.mkdirSync(targetDir, { recursive: true });
+      for (const file of fs.readdirSync(sourceDir)) {
+        if (file.endsWith('.json')) {
+          fs.copyFileSync(
+            path.join(sourceDir, file),
+            path.join(targetDir, file)
+          );
+        }
+      }
+    });
+  }
+}
 
 /** @type WebpackConfig */
 const extensionConfig = {
@@ -44,5 +64,8 @@ const extensionConfig = {
   infrastructureLogging: {
     level: "log", // enables logging required for problem matchers
   },
+  plugins: [
+    new CopyInsightsDataPlugin()
+  ],
 };
 module.exports = [ extensionConfig ];

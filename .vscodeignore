@@ -1,12 +1,16 @@
 .vscode/**
 .vscode-test/**
 out/**
+test/**
 node_modules/**
+images/logo*.png
 src/**
 .gitignore
+.env
 .yarnrc
 webpack.config.js
 vsc-extension-quickstart.md
+et --hard a1b2c3d
 **/tsconfig.json
 **/eslint.config.mjs
 **/*.map
