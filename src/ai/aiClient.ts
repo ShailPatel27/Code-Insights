@@ -50,10 +50,11 @@ type GeminiResponse = {
 export async function askInsightAi(
 	context: vscode.ExtensionContext,
 	entry: InsightEntry,
-	messages: ChatMessage[]
+	messages: ChatMessage[],
+	responseStyle = 'simple'
 ): Promise<string> {
 	const config = getAiConfig(context);
-	const systemPrompt = buildSystemPrompt(entry);
+	const systemPrompt = buildSystemPrompt(entry, responseStyle);
 
 	if (config.provider === 'gemini') {
 		return askGemini(config, systemPrompt, messages);
@@ -64,7 +65,8 @@ export async function askInsightAi(
 
 export function getAiConfig(context: vscode.ExtensionContext): AiConfig {
 	const env = loadEnv(context);
-	const provider = (env.CODE_INSIGHTS_AI_PROVIDER ?? 'openai').toLowerCase();
+	const configuredProvider = (env.CODE_INSIGHTS_AI_PROVIDER ?? '').toLowerCase();
+	const provider = resolveProvider(configuredProvider, env);
 
 	if (provider !== 'openai' && provider !== 'gemini') {
 		throw new Error('CODE_INSIGHTS_AI_PROVIDER must be "openai" or "gemini".');
@@ -93,6 +95,26 @@ export function getAiConfig(context: vscode.ExtensionContext): AiConfig {
 		apiKey,
 		model: env.CODE_INSIGHTS_AI_MODEL ?? env.OPENAI_MODEL ?? 'gpt-4.1-mini'
 	};
+}
+
+function resolveProvider(configuredProvider: string, env: Env): AiProvider {
+	if (configuredProvider && configuredProvider !== 'openai' && configuredProvider !== 'gemini') {
+		throw new Error('CODE_INSIGHTS_AI_PROVIDER must be "openai" or "gemini".');
+	}
+
+	if (configuredProvider === 'gemini') {
+		return 'gemini';
+	}
+
+	if (configuredProvider === 'openai' && env.OPENAI_API_KEY) {
+		return 'openai';
+	}
+
+	if (env.GEMINI_API_KEY) {
+		return 'gemini';
+	}
+
+	return 'openai';
 }
 
 function loadEnv(context: vscode.ExtensionContext): Env {
@@ -152,9 +174,10 @@ function unquote(value: string): string {
 	return value;
 }
 
-function buildSystemPrompt(entry: InsightEntry): string {
+function buildSystemPrompt(entry: InsightEntry, responseStyle: string): string {
 	const notes = entry.behavioralNotes?.map(note => `- ${note}`).join('\n') ?? '- No behavioral notes available.';
 	const usage = entry.usage?.map(item => `${item.title ?? 'Usage'}:\n${item.code ?? ''}`).join('\n\n') ?? 'No usage example available.';
+	const styleInstruction = getStyleInstruction(responseStyle);
 
 	return [
 		'You are Code Insights, a concise teaching assistant inside VS Code.',
@@ -163,7 +186,8 @@ function buildSystemPrompt(entry: InsightEntry): string {
 		'You know the currently selected function context below.',
 		'Decide from each user question whether they are asking about this function or a broader programming topic.',
 		'If the question is about something else, answer normally and briefly mention when the current function context is not relevant.',
-		'Keep answers short and practical.',
+		styleInstruction,
+		'Use Markdown formatting naturally: short paragraphs, bullets when useful, **bold** for key terms, and fenced code blocks for code.',
 		'',
 		`Function: ${entry.qualifiedName ?? 'unknown'}`,
 		`Signature: ${entry.signature ?? 'unknown'}`,
@@ -173,6 +197,22 @@ function buildSystemPrompt(entry: InsightEntry): string {
 		'Usage:',
 		usage
 	].join('\n');
+}
+
+function getStyleInstruction(responseStyle: string): string {
+	if (responseStyle === 'short') {
+		return 'Response style: short. Answer in 1-3 concise sentences unless code is necessary.';
+	}
+
+	if (responseStyle === 'detailed') {
+		return 'Response style: detailed. Explain the concept with practical examples and mention common mistakes.';
+	}
+
+	if (responseStyle === 'baby') {
+		return 'Response style: baby. Explain like the user is a child or total beginner, using simple words and gentle analogies.';
+	}
+
+	return 'Response style: simple. Keep the answer clear, practical, and not too long.';
 }
 
 async function askOpenAI(config: AiConfig, systemPrompt: string, messages: ChatMessage[]): Promise<string> {

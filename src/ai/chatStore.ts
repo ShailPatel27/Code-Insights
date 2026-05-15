@@ -121,6 +121,10 @@ export class ChatStore {
 		this.writeDb(db);
 	}
 
+	clearTemporaryChats(): void {
+		this.temporaryChats.clear();
+	}
+
 	private readDb(): ChatDb {
 		fs.mkdirSync(this.context.globalStorageUri.fsPath, { recursive: true });
 

@@ -70,6 +70,10 @@ export function buildPanelHtml(): string {
 			padding: 16px;
 		}
 
+		.content.ai-content {
+			padding: 0;
+		}
+
 		pre {
 			background: var(--vscode-textBlockQuote-background);
 			padding: 10px;
@@ -100,12 +104,32 @@ export function buildPanelHtml(): string {
 
 		button {
 			font-size: 12px;
-			padding: 4px 8px;
+			padding: 8px 11px;
 			background: var(--vscode-button-secondaryBackground);
 			color: var(--vscode-button-secondaryForeground);
-			border: none;
-			border-radius: 4px;
+			border: 1px solid var(--vscode-panel-border);
+			border-radius: 7px;
 			cursor: pointer;
+			line-height: 1.2;
+			transition: background 120ms ease, border-color 120ms ease;
+		}
+
+		button:hover {
+			background: var(--vscode-button-secondaryHoverBackground);
+		}
+
+		.primary-button {
+			background: var(--vscode-button-background);
+			color: var(--vscode-button-foreground);
+		}
+
+		.primary-button:hover {
+			background: var(--vscode-button-hoverBackground);
+		}
+
+		.icon-button {
+			min-width: 30px;
+			padding: 6px 8px;
 		}
 
 		.section {
@@ -151,48 +175,179 @@ export function buildPanelHtml(): string {
 		}
 
 		.ai-shell {
-			display: grid;
-			grid-template-columns: 190px 1fr;
-			gap: 14px;
-			min-height: 420px;
+			display: block;
+			min-height: calc(100vh - 42px);
+			background: var(--vscode-editor-background);
 		}
 
-		.chat-list {
-			border-right: 1px solid var(--vscode-panel-border);
-			padding-right: 10px;
+		.chat-menu {
+			position: relative;
+		}
+
+		.chat-menu summary {
+			cursor: pointer;
+			list-style: none;
+			padding: 7px 11px;
+			font-weight: 600;
+			border: 1px solid var(--vscode-button-border, var(--vscode-panel-border));
+			border-radius: 8px;
+			background: var(--vscode-button-secondaryBackground, var(--vscode-editorWidget-background));
+			color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+		}
+
+		.chat-menu summary::-webkit-details-marker {
+			display: none;
+		}
+
+		.chat-drawer-body {
+			position: absolute;
+			top: calc(100% + 8px);
+			right: 0;
+			z-index: 10;
+			width: min(360px, calc(100vw - 36px));
+			max-height: min(430px, calc(100vh - 150px));
+			overflow: auto;
+			padding: 14px;
+			border: 1px solid var(--vscode-panel-border);
+			border-radius: 10px;
+			background: var(--vscode-sideBar-background);
+			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+		}
+
+		.chat-list-title {
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: var(--vscode-descriptionForeground);
+			margin: 12px 0 8px;
 		}
 
 		.chat-actions {
-			display: flex;
-			gap: 6px;
-			margin-bottom: 10px;
+			display: grid;
+			grid-template-columns: max-content max-content;
+			gap: 8px;
+			margin-bottom: 14px;
+		}
+
+		.chat-items {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 8px;
 		}
 
 		.chat-item {
 			width: 100%;
 			text-align: left;
-			margin-bottom: 6px;
+			padding: 9px 10px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
+			background: transparent;
+			color: var(--vscode-sideBar-foreground);
+			border-color: transparent;
 		}
 
 		.chat-item.active {
-			background: var(--vscode-button-background);
-			color: var(--vscode-button-foreground);
+			background: var(--vscode-list-activeSelectionBackground);
+			color: var(--vscode-list-activeSelectionForeground);
+			border-color: transparent;
+		}
+
+		.ai-main {
+			display: grid;
+			grid-template-rows: auto minmax(0, 1fr) auto;
+			min-height: calc(100vh - 42px);
+		}
+
+		.ai-topbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			padding: 14px 18px;
+			border-bottom: 1px solid var(--vscode-panel-border);
+			background: var(--vscode-editor-background);
+		}
+
+		.ai-title {
+			min-width: 0;
+		}
+
+		.ai-title h2 {
+			font-size: 16px;
+			line-height: 1.2;
+			margin: 0 0 4px;
+			font-weight: 600;
+		}
+
+		.ai-subtitle {
+			color: var(--vscode-descriptionForeground);
+			font-size: 12px;
+		}
+
+		.ai-top-actions {
+			display: flex;
+			gap: 8px;
+			flex-shrink: 0;
+			align-items: center;
+			flex-wrap: wrap;
+			justify-content: flex-end;
+		}
+
+		.response-style {
+			background: var(--vscode-dropdown-background);
+			color: var(--vscode-dropdown-foreground);
+			border: 1px solid var(--vscode-dropdown-border);
+			border-radius: 7px;
+			padding: 7px 9px;
+			font-size: 12px;
+		}
+
+		.ai-body {
+			overflow-y: auto;
+			padding: 22px 18px 14px;
+		}
+
+		.ai-empty {
+			max-width: 760px;
+			margin: 18px auto 0;
+		}
+
+		.ai-empty h3 {
+			font-size: 20px;
+			margin: 0 0 6px;
+			font-weight: 600;
+		}
+
+		.ai-empty p {
+			margin: 0 0 18px;
+			color: var(--vscode-descriptionForeground);
 		}
 
 		.faq-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-			gap: 8px;
-			margin-bottom: 12px;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
 		}
 
 		.faq-button {
 			text-align: left;
 			line-height: 1.35;
-			padding: 8px;
+			padding: 13px;
+			border-color: var(--vscode-panel-border);
+			background: var(--vscode-editorWidget-background);
+			min-height: 62px;
+			font-size: 13px;
+		}
+
+		.faq-collapsed {
+			margin-bottom: 14px;
+		}
+
+		.faq-collapsed summary {
+			cursor: pointer;
+			color: var(--vscode-textLink-foreground);
+			margin-bottom: 10px;
 		}
 
 		.chat-header {
@@ -200,7 +355,7 @@ export function buildPanelHtml(): string {
 			gap: 8px;
 			align-items: center;
 			justify-content: space-between;
-			margin-bottom: 10px;
+			margin-bottom: 16px;
 		}
 
 		.chat-title {
@@ -211,37 +366,134 @@ export function buildPanelHtml(): string {
 		}
 
 		.message {
-			margin-bottom: 14px;
-			padding: 10px;
-			border-radius: 6px;
-			border: 1px solid var(--vscode-panel-border);
+			max-width: 820px;
+			margin: 0 auto 16px;
+			padding: 0;
+			border: none;
+			background: transparent;
 		}
 
 		.message.user {
-			background: var(--vscode-input-background);
+			display: flex;
+			justify-content: flex-end;
 		}
 
 		.message.assistant {
-			background: var(--vscode-textBlockQuote-background);
+			display: block;
 		}
 
 		.message-role {
 			font-size: 11px;
 			text-transform: uppercase;
 			color: var(--vscode-descriptionForeground);
-			margin-bottom: 6px;
+			margin-bottom: 7px;
+			letter-spacing: 0.02em;
+		}
+
+		.message.user .message-role {
+			display: none;
+		}
+
+		.message-content {
+			line-height: 1.55;
+			font-size: 13px;
+		}
+
+		.message.user .message-content {
+			max-width: min(72%, 640px);
+			padding: 10px 12px;
+			border-radius: 14px;
+			background: var(--vscode-button-background);
+			color: var(--vscode-button-foreground);
+		}
+
+		.message.assistant .message-content {
+			padding: 4px 0;
+		}
+
+		.message-content p {
+			margin: 0 0 10px;
+		}
+
+		.message-content ul {
+			margin: 6px 0 12px 18px;
+			padding: 0;
+		}
+
+		.message-content li {
+			margin-bottom: 5px;
+		}
+
+		.message-content code {
+			font-family: var(--vscode-editor-font-family);
+			background: var(--vscode-textCodeBlock-background, rgba(127,127,127,0.16));
+			border-radius: 4px;
+			padding: 1px 4px;
 		}
 
 		.markdown-code {
 			background: var(--vscode-editor-background);
 			border: 1px solid var(--vscode-panel-border);
-			border-radius: 6px;
-			padding: 10px;
+			border-radius: 8px;
+			padding: 12px;
 			overflow-x: auto;
+			margin: 12px 0;
+			font-family: var(--vscode-editor-font-family);
+			font-size: 12px;
+		}
+
+		.markdown-code code {
+			background: transparent;
+			padding: 0;
 		}
 
 		.composer {
-			margin-top: 12px;
+			padding: 12px 18px 16px;
+			border-top: 1px solid var(--vscode-panel-border);
+			background: var(--vscode-editor-background);
+		}
+
+		.composer-row {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			max-width: 820px;
+			margin: 0 auto;
+			padding: 8px;
+			border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+			border-radius: 12px;
+			background: var(--vscode-input-background);
+		}
+
+		.composer-row textarea {
+			margin: 0;
+			min-height: 38px;
+			max-height: 140px;
+			border: none;
+			background: transparent;
+			padding: 8px;
+			outline: none;
+			resize: none;
+		}
+
+		.composer-row button {
+			border-radius: 9px;
+			min-width: 58px;
+			align-self: flex-end;
+		}
+
+		.composer-hint {
+			display: none;
+		}
+
+		@media (max-width: 720px) {
+			.ai-shell {
+				grid-template-columns: 1fr;
+			}
+
+			.faq-grid {
+				grid-template-columns: 1fr;
+			}
 		}
 		</style>
 		</head>
@@ -265,6 +517,7 @@ export function buildPanelHtml(): string {
 			let aiLoading = false;
 			let chats = [];
 			let activeChat = null;
+			let responseStyle = localStorage.getItem('codeInsightsResponseStyle') ?? 'simple';
 			const faqQuestions = [
 				'Why is this function useful?',
 				'Does this mutate my data or return a new value?',
@@ -284,6 +537,7 @@ export function buildPanelHtml(): string {
 				);
 
 				const c = document.getElementById('content');
+				c.classList.toggle('ai-content', currentMode === 'ai');
 
 				if (currentMode === 'test') {
 					c.innerHTML = buildTest(currentEntry);
@@ -399,7 +653,8 @@ export function buildPanelHtml(): string {
 				vscode.postMessage({
 					type: 'askAi',
 					question,
-					chatId: activeChat?.id
+					chatId: activeChat?.id,
+					responseStyle
 				});
 			}
 
@@ -409,7 +664,8 @@ export function buildPanelHtml(): string {
 				render();
 				vscode.postMessage({
 					type: 'askFaq',
-					question
+					question,
+					responseStyle
 				});
 			}
 
@@ -422,7 +678,11 @@ export function buildPanelHtml(): string {
 			}
 
 			function deleteChat(chatId) {
-				vscode.postMessage({ type: 'deleteChat', chatId });
+				const chat = chats.find(item => item.id === chatId);
+				const title = chat?.title ?? 'this chat';
+				if (confirm('Delete "' + title + '"? This cannot be undone.')) {
+					vscode.postMessage({ type: 'deleteChat', chatId });
+				}
 			}
 
 			function renameChat(chatId) {
@@ -439,54 +699,90 @@ export function buildPanelHtml(): string {
 				}
 			}
 
+			function setResponseStyle(value) {
+				responseStyle = value;
+				localStorage.setItem('codeInsightsResponseStyle', value);
+			}
+
 			function buildAi(entry) {
 				const visibleChats = chats.filter(chat => chat.functionKey === currentFunctionKey);
 				const messages = activeChat?.messages ?? [];
+				const hasStartedChat = messages.length > 0;
+				const faqMarkup = \`
+					<div class="faq-grid">
+						\${faqQuestions.map(question => \`
+							<button class="faq-button" onclick="askFaq('\${escapeJsString(question)}')">\${escapeHtml(question)}</button>
+						\`).join('')}
+					</div>
+				\`;
 
 				return \`
-					<h2>\${escapeHtml(entry.qualifiedName)}</h2>
-
 					<div class="ai-shell">
-						<div class="chat-list">
-							<div class="chat-actions">
-								<button onclick="newChat(false)">New</button>
-								<button onclick="newChat(true)">Temporary</button>
-							</div>
-								\${visibleChats.map(chat => \`
-								<button class="chat-item \${activeChat?.id === chat.id ? 'active' : ''}" onclick="selectChat('\${escapeJsString(chat.id)}')">\${escapeHtml(chat.title)}\${chat.id.startsWith('temp-') ? ' (temp)' : ''}</button>
-							\`).join('')}
-						</div>
-
-						<div>
-							<div class="faq-grid">
-								\${faqQuestions.map(question => \`
-									<button class="faq-button" onclick="askFaq('\${escapeJsString(question)}')">\${escapeHtml(question)}</button>
-								\`).join('')}
-							</div>
-
-							<div class="chat-header">
-								<div class="chat-title">\${escapeHtml(activeChat?.title ?? 'New chat')}</div>
-								<div>
+						<div class="ai-main">
+							<div class="ai-topbar">
+								<div class="ai-title">
+									<h2>Ask AI</h2>
+									<div class="ai-subtitle">Current function: \${escapeHtml(entry.qualifiedName)}</div>
+								</div>
+								<div class="ai-top-actions">
+									<details class="chat-menu">
+										<summary>Chats</summary>
+										<div class="chat-drawer-body">
+											<div class="chat-actions">
+												<button class="primary-button" onclick="newChat(false)">New chat</button>
+												<button onclick="newChat(true)">Temporary</button>
+											</div>
+											<div class="chat-list-title">Saved chats</div>
+											<div class="chat-items">
+												\${visibleChats.length ? visibleChats.map(chat => \`
+													<button class="chat-item \${activeChat?.id === chat.id ? 'active' : ''}" onclick="selectChat('\${escapeJsString(chat.id)}')">\${escapeHtml(chat.title)}\${chat.id.startsWith('temp-') ? ' (temp)' : ''}</button>
+												\`).join('') : '<span class="notice">No saved chats yet.</span>'}
+											</div>
+										</div>
+									</details>
+									<select class="response-style" onchange="setResponseStyle(this.value)">
+										<option value="simple" \${responseStyle === 'simple' ? 'selected' : ''}>Simple</option>
+										<option value="short" \${responseStyle === 'short' ? 'selected' : ''}>Short</option>
+										<option value="detailed" \${responseStyle === 'detailed' ? 'selected' : ''}>Detailed</option>
+										<option value="baby" \${responseStyle === 'baby' ? 'selected' : ''}>Baby</option>
+									</select>
+									\${hasStartedChat ? \`
+										<details class="faq-collapsed">
+											<summary>Suggested questions</summary>
+											\${faqMarkup}
+										</details>
+									\` : ''}
 									\${activeChat ? \`
-										<button onclick="renameChat('\${escapeJsString(activeChat.id)}')">Rename</button>
-										<button onclick="deleteChat('\${escapeJsString(activeChat.id)}')">Delete</button>
+										<button title="Rename chat" onclick="renameChat('\${escapeJsString(activeChat.id)}')">Rename</button>
+										<button title="Delete chat" onclick="deleteChat('\${escapeJsString(activeChat.id)}')">Delete</button>
 									\` : ''}
 								</div>
 							</div>
 
-							<div class="messages">
-								\${messages.length ? messages.map(message => \`
-									<div class="message \${message.role}">
-										<div class="message-role">\${message.role === 'user' ? 'You' : 'AI'}</div>
-										<div>\${renderMarkdown(message.content)}</div>
+							<div class="ai-body">
+								\${hasStartedChat ? '' : \`
+									<div class="ai-empty">
+										<h3>How can I help with \${escapeHtml(entry.qualifiedName)}?</h3>
+										<p>Ask about return values, mutation, side effects, examples, or anything else you are unsure about.</p>
+										\${faqMarkup}
 									</div>
-								\`).join('') : '<p class="notice"><em>Start a chat or click a suggested question.</em></p>'}
+								\`}
+
+								<div class="messages">
+									\${messages.map(message => \`
+										<div class="message \${message.role}">
+											<div class="message-role">\${message.role === 'user' ? 'You' : 'Code Insights'}</div>
+											<div class="message-content">\${renderMarkdown(message.content)}</div>
+										</div>
+									\`).join('')}
+								</div>
 							</div>
 
 							<div class="composer">
-								<textarea id="ai-question" placeholder="Ask about this function or anything else..." onkeydown="handleComposerKeydown(event)"></textarea>
-								<button onclick="sendQuestion()">\${aiLoading ? 'Sending...' : 'Send'}</button>
-								<p class="notice">Enter sends. Shift+Enter adds a new line.</p>
+								<div class="composer-row">
+									<textarea id="ai-question" placeholder="Ask about this function or anything else..." onkeydown="handleComposerKeydown(event)"></textarea>
+									<button class="primary-button" onclick="sendQuestion()">\${aiLoading ? 'Sending...' : 'Send'}</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -516,11 +812,29 @@ export function buildPanelHtml(): string {
 						return '<pre class="markdown-code"><code>' + escapeHtml(part.trim()) + '</code></pre>';
 					}
 
-					return escapeHtml(part)
-						.split(/\\n{2,}/)
-						.map(paragraph => '<p>' + paragraph.replace(/\\n/g, '<br />') + '</p>')
-						.join('');
+					return renderMarkdownText(part);
 				}).join('');
+			}
+
+			function renderMarkdownText(text) {
+				const blocks = String(text ?? '').split(/\\n{2,}/);
+				return blocks.map(block => {
+					const lines = block.split('\\n');
+					if (lines.every(line => /^\\s*[*-]\\s+/.test(line))) {
+						return '<ul>' + lines.map(line =>
+							'<li>' + formatInline(line.replace(/^\\s*[*-]\\s+/, '')) + '</li>'
+						).join('') + '</ul>';
+					}
+
+					return '<p>' + formatInline(block).replace(/\\n/g, '<br />') + '</p>';
+				}).join('');
+			}
+
+			function formatInline(text) {
+				const tick = String.fromCharCode(96);
+				return escapeHtml(text)
+					.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')
+					.replace(new RegExp(tick + '([^' + tick + ']+)' + tick, 'g'), '<code>$1</code>');
 			}
 
 			window.addEventListener('message', e => {
@@ -597,6 +911,7 @@ export function openPanel(
 		);
 
 		panel.onDidDispose(() => {
+			chatStore?.clearTemporaryChats();
 			panel = undefined;
 		});
 
@@ -622,7 +937,7 @@ export function openPanel(
 					const chat = ensureChat(String(msg.chatId ?? ''), activeFunctionKey ?? functionKey, false);
 					chatStore?.addMessage(chat.id, createMessage('user', String(msg.question ?? '')));
 					const currentChat = chatStore?.getChat(chat.id) ?? chat;
-					const answer = await askInsightAi(context, activeEntry ?? entry, currentChat.messages);
+					const answer = await askInsightAi(context, activeEntry ?? entry, currentChat.messages, String(msg.responseStyle ?? 'simple'));
 					const updatedChat = chatStore?.addMessage(chat.id, createMessage('assistant', answer)) ?? currentChat;
 					panel?.webview.postMessage({
 						type: 'aiResult',
@@ -642,7 +957,7 @@ export function openPanel(
 					if (!chat) { throw new Error('Chat store is not available.'); }
 					chatStore?.addMessage(chat.id, createMessage('user', question));
 					const currentChat = chatStore?.getChat(chat.id) ?? chat;
-					const answer = await askInsightAi(context, activeEntry ?? entry, currentChat.messages);
+					const answer = await askInsightAi(context, activeEntry ?? entry, currentChat.messages, String(msg.responseStyle ?? 'simple'));
 					const updatedChat = chatStore?.addMessage(chat.id, createMessage('assistant', answer)) ?? currentChat;
 					panel?.webview.postMessage({
 						type: 'aiResult',
@@ -656,6 +971,7 @@ export function openPanel(
 			}
 
 			if (msg?.type === 'newChat') {
+				chatStore?.clearTemporaryChats();
 				const chat = chatStore?.createChat(activeFunctionKey ?? functionKey, Boolean(msg.temporary));
 				panel?.webview.postMessage({
 					type: 'aiState',
@@ -665,7 +981,12 @@ export function openPanel(
 			}
 
 			if (msg?.type === 'selectChat') {
-				postAiState(activeFunctionKey ?? functionKey, String(msg.chatId ?? ''));
+				const chatId = String(msg.chatId ?? '');
+				const selectedChat = chatStore?.getChat(chatId);
+				if (selectedChat && !selectedChat.id.startsWith('temp-')) {
+					chatStore?.clearTemporaryChats();
+				}
+				postAiState(activeFunctionKey ?? functionKey, chatId);
 			}
 
 			if (msg?.type === 'deleteChat') {

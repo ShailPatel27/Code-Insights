@@ -3,11 +3,21 @@
   "displayName": "Code Insights",
   "description": "Show insights about what Python code does",
   "version": "0.4.0",
+  "icon": "images/logo-without-text-without-background.png",
   "engines": {
     "vscode": "^1.107.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "python",
+    "numpy",
+    "ai",
+    "learning",
+    "debugging",
+    "code insights",
+    "developer tools"
   ],
   "activationEvents": [
     "onLanguage:python"

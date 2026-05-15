@@ -3,7 +3,7 @@
 out/**
 test/**
 node_modules/**
-images/logo*.png
+images/logo-full*.png
 src/**
 .gitignore
 .env
