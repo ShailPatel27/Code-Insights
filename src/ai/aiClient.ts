@@ -18,7 +18,7 @@ type AiProvider = 'openai' | 'gemini';
 type AiConfig = {
 	provider: AiProvider;
 	model: string;
-	apiKey: string;
+	apiKeys: string[];
 };
 
 type OpenAIResponse = {
@@ -51,16 +51,40 @@ export async function askInsightAi(
 	context: vscode.ExtensionContext,
 	entry: InsightEntry,
 	messages: ChatMessage[],
-	responseStyle = 'simple'
+	responseStyle = 'simple',
+	chatScope = 'function'
 ): Promise<string> {
 	const config = getAiConfig(context);
-	const systemPrompt = buildSystemPrompt(entry, responseStyle);
+	const systemPrompt = buildSystemPrompt(entry, responseStyle, chatScope);
 
 	if (config.provider === 'gemini') {
 		return askGemini(config, systemPrompt, messages);
 	}
 
 	return askOpenAI(config, systemPrompt, messages);
+}
+
+export async function suggestChatTitle(context: vscode.ExtensionContext, firstMessage: string): Promise<string> {
+	const config = getAiConfig(context);
+	const prompt = [
+		'Create a short chat title for this developer question.',
+		'Return only the title. No quotes. No punctuation at the end.',
+		'Use 2 to 5 words.',
+		'',
+		firstMessage
+	].join('\n');
+	const messages: ChatMessage[] = [
+		{
+			role: 'user',
+			content: prompt,
+			createdAt: new Date().toISOString()
+		}
+	];
+	const title = config.provider === 'gemini'
+		? await askGemini(config, 'You create concise chat titles.', messages)
+		: await askOpenAI(config, 'You create concise chat titles.', messages);
+
+	return cleanTitle(title, firstMessage);
 }
 
 export function getAiConfig(context: vscode.ExtensionContext): AiConfig {
@@ -73,26 +97,26 @@ export function getAiConfig(context: vscode.ExtensionContext): AiConfig {
 	}
 
 	if (provider === 'gemini') {
-		const apiKey = env.GEMINI_API_KEY;
-		if (!apiKey) {
+		const apiKeys = parseApiKeys(env.GEMINI_API_KEY);
+		if (!apiKeys.length) {
 			throw new Error('Missing GEMINI_API_KEY in .env.');
 		}
 
 		return {
 			provider,
-			apiKey,
+			apiKeys,
 			model: env.CODE_INSIGHTS_AI_MODEL ?? env.GEMINI_MODEL ?? 'gemini-2.5-flash'
 		};
 	}
 
-	const apiKey = env.OPENAI_API_KEY;
-	if (!apiKey) {
+	const apiKeys = parseApiKeys(env.OPENAI_API_KEY);
+	if (!apiKeys.length) {
 		throw new Error('Missing OPENAI_API_KEY in .env.');
 	}
 
 	return {
 		provider,
-		apiKey,
+		apiKeys,
 		model: env.CODE_INSIGHTS_AI_MODEL ?? env.OPENAI_MODEL ?? 'gpt-4.1-mini'
 	};
 }
@@ -174,10 +198,20 @@ function unquote(value: string): string {
 	return value;
 }
 
-function buildSystemPrompt(entry: InsightEntry, responseStyle: string): string {
+function parseApiKeys(value: string | undefined): string[] {
+	return value
+		?.split(',')
+		.map(key => key.trim())
+		.filter(Boolean) ?? [];
+}
+
+function buildSystemPrompt(entry: InsightEntry, responseStyle: string, chatScope: string): string {
 	const notes = entry.behavioralNotes?.map(note => `- ${note}`).join('\n') ?? '- No behavioral notes available.';
 	const usage = entry.usage?.map(item => `${item.title ?? 'Usage'}:\n${item.code ?? ''}`).join('\n\n') ?? 'No usage example available.';
 	const styleInstruction = getStyleInstruction(responseStyle);
+	const scopeInstruction = chatScope === 'general'
+		? 'Conversation scope: general. Answer the user normally. Use the current function only if it is clearly relevant.'
+		: 'Conversation scope: current function. Prioritize the selected function context unless the user clearly asks something unrelated.';
 
 	return [
 		'You are Code Insights, a concise teaching assistant inside VS Code.',
@@ -186,8 +220,9 @@ function buildSystemPrompt(entry: InsightEntry, responseStyle: string): string {
 		'You know the currently selected function context below.',
 		'Decide from each user question whether they are asking about this function or a broader programming topic.',
 		'If the question is about something else, answer normally and briefly mention when the current function context is not relevant.',
+		scopeInstruction,
 		styleInstruction,
-		'Use Markdown formatting naturally: short paragraphs, bullets when useful, **bold** for key terms, and fenced code blocks for code.',
+		'Use Markdown formatting naturally: short paragraphs, bullets when useful, **bold** for key terms, tables when comparing things, and fenced code blocks for code.',
 		'',
 		`Function: ${entry.qualifiedName ?? 'unknown'}`,
 		`Signature: ${entry.signature ?? 'unknown'}`,
@@ -215,15 +250,47 @@ function getStyleInstruction(responseStyle: string): string {
 	return 'Response style: simple. Keep the answer clear, practical, and not too long.';
 }
 
+function cleanTitle(title: string, fallback: string): string {
+	const compact = title
+		.replace(/^["']|["']$/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+
+	if (!compact) {
+		return fallback.replace(/\s+/g, ' ').trim().slice(0, 48) || 'New chat';
+	}
+
+	return compact.length > 48 ? `${compact.slice(0, 45)}...` : compact;
+}
+
 async function askOpenAI(config: AiConfig, systemPrompt: string, messages: ChatMessage[]): Promise<string> {
+	let lastError: Error | undefined;
+
+	for (const apiKey of config.apiKeys) {
+		try {
+			return await askOpenAIWithKey(config.model, apiKey, systemPrompt, messages);
+		} catch (error) {
+			lastError = error instanceof Error ? error : new Error('OpenAI request failed.');
+		}
+	}
+
+	throw lastError ?? new Error('OpenAI request failed.');
+}
+
+async function askOpenAIWithKey(
+	model: string,
+	apiKey: string,
+	systemPrompt: string,
+	messages: ChatMessage[]
+): Promise<string> {
 	const response = await fetch('https://api.openai.com/v1/responses', {
 		method: 'POST',
 		headers: {
-			'Authorization': `Bearer ${config.apiKey}`,
+			'Authorization': `Bearer ${apiKey}`,
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			model: config.model,
+			model,
 			input: [
 				{ role: 'system', content: systemPrompt },
 				...messages.map(message => ({
@@ -252,8 +319,27 @@ async function askOpenAI(config: AiConfig, systemPrompt: string, messages: ChatM
 }
 
 async function askGemini(config: AiConfig, systemPrompt: string, messages: ChatMessage[]): Promise<string> {
-	const model = encodeURIComponent(config.model);
-	const key = encodeURIComponent(config.apiKey);
+	let lastError: Error | undefined;
+
+	for (const apiKey of config.apiKeys) {
+		try {
+			return await askGeminiWithKey(config.model, apiKey, systemPrompt, messages);
+		} catch (error) {
+			lastError = error instanceof Error ? error : new Error('Gemini request failed.');
+		}
+	}
+
+	throw lastError ?? new Error('Gemini request failed.');
+}
+
+async function askGeminiWithKey(
+	modelName: string,
+	apiKey: string,
+	systemPrompt: string,
+	messages: ChatMessage[]
+): Promise<string> {
+	const model = encodeURIComponent(modelName);
+	const key = encodeURIComponent(apiKey);
 	const response = await fetch(
 		`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
 		{

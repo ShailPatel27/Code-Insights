@@ -11,7 +11,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Fixed resolver support for two-part NumPy calls such as `np.sort(...)` and `np.copy(...)`.
 - Added resolver tests for NumPy aliases, direct imports, Python built-ins, list methods, and non-NumPy aliases.
 - Added a working Ask AI tab with environment-driven OpenAI and Gemini support.
-- Added FAQ starter questions, multi-turn chat memory, local JSON chat storage, temporary chats, rename/delete, 30-day auto cleanup, and styled code block rendering.
+- Added FAQ starter questions, multi-turn chat memory, local JSON chat storage, temporary chats, rename/delete, 30-day auto cleanup, response style controls, code/response copy actions, responsive Markdown rendering, and styled code block rendering.
+- Added comma-separated OpenAI/Gemini API key fallback support.
 - Kept Test educational only: no code execution, sandboxing, or Python runtime.
 - Fixed Marketplace packaging so bundled insight data is available after install.
 - Updated release metadata and documentation for v0.4.0.

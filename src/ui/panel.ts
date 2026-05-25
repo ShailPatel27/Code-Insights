@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { askInsightAi } from "../ai/aiClient";
+import { askInsightAi, suggestChatTitle } from "../ai/aiClient";
 import { ChatStore, createMessage, type SavedChat } from "../ai/chatStore";
 import { loadInsights } from "../data/insightsLoader";
 
@@ -48,9 +48,13 @@ export function buildPanelHtml(): string {
 		}
 
 		.tabs {
+			position: sticky;
+			top: 0;
+			z-index: 20;
 			display: grid;
 			grid-template-columns: repeat(3, 1fr);
 			border-bottom: 1px solid var(--vscode-panel-border);
+			background: var(--vscode-editor-background);
 		}
 
 		.tab {
@@ -72,6 +76,9 @@ export function buildPanelHtml(): string {
 
 		.content.ai-content {
 			padding: 0;
+			margin-top: -1px;
+			height: calc(100vh - 41px);
+			overflow: hidden;
 		}
 
 		pre {
@@ -176,8 +183,38 @@ export function buildPanelHtml(): string {
 
 		.ai-shell {
 			display: block;
-			min-height: calc(100vh - 42px);
+			height: calc(100vh - 41px);
 			background: var(--vscode-editor-background);
+		}
+
+		.ai-subtabs {
+			position: relative;
+			z-index: 19;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0;
+			padding: 0 18px;
+			border-bottom: 1px solid var(--vscode-panel-border);
+			background: var(--vscode-editor-background);
+		}
+
+		.ai-subtab {
+			min-width: 0;
+			width: 100%;
+			padding: 11px 12px;
+			border: none;
+			border-bottom: 2px solid transparent;
+			border-radius: 0;
+			background: transparent;
+			color: var(--vscode-descriptionForeground);
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.ai-subtab.active {
+			color: var(--vscode-foreground);
+			border-bottom-color: var(--vscode-textLink-foreground);
 		}
 
 		.chat-menu {
@@ -256,56 +293,115 @@ export function buildPanelHtml(): string {
 		.ai-main {
 			display: grid;
 			grid-template-rows: auto minmax(0, 1fr) auto;
-			min-height: calc(100vh - 42px);
-		}
-
-		.ai-topbar {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 12px;
-			padding: 14px 18px;
-			border-bottom: 1px solid var(--vscode-panel-border);
-			background: var(--vscode-editor-background);
-		}
-
-		.ai-title {
-			min-width: 0;
-		}
-
-		.ai-title h2 {
-			font-size: 16px;
-			line-height: 1.2;
-			margin: 0 0 4px;
-			font-weight: 600;
+			height: calc(100vh - 41px);
 		}
 
 		.ai-subtitle {
 			color: var(--vscode-descriptionForeground);
 			font-size: 12px;
+			max-width: 820px;
+			margin: 0 auto 16px;
+			text-align: center;
 		}
 
-		.ai-top-actions {
+		.context-line {
+			position: relative;
+			z-index: 18;
 			display: flex;
-			gap: 8px;
-			flex-shrink: 0;
+			justify-content: center;
 			align-items: center;
-			flex-wrap: wrap;
-			justify-content: flex-end;
+			padding: 8px 18px;
+			background: var(--vscode-editor-background);
+			border-bottom: 1px solid var(--vscode-panel-border);
 		}
 
-		.response-style {
-			background: var(--vscode-dropdown-background);
-			color: var(--vscode-dropdown-foreground);
-			border: 1px solid var(--vscode-dropdown-border);
-			border-radius: 7px;
-			padding: 7px 9px;
-			font-size: 12px;
+		.scope-button.active {
+			background: var(--vscode-button-background);
+			color: var(--vscode-button-foreground);
+		}
+
+		.scope-button {
+			min-width: 34px;
+		}
+
+		.history-view {
+			max-width: 860px;
+			margin: 0 auto;
+			display: grid;
+			gap: 8px;
+		}
+
+		.history-row {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) max-content max-content;
+			gap: 8px;
+			align-items: center;
+			padding: 9px;
+			border: 1px solid var(--vscode-panel-border);
+			border-radius: 8px;
+			background: var(--vscode-editorWidget-background);
+		}
+
+		.history-row:hover {
+			border-color: var(--vscode-focusBorder);
+		}
+
+		.history-row.active {
+			border-color: var(--vscode-textLink-foreground);
+		}
+
+		.history-title {
+			text-align: left;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			background: transparent;
+			border-color: transparent;
+		}
+
+		.icon-button {
+			min-width: 30px;
+			width: 30px;
+			height: 30px;
+			padding: 0;
+			display: inline-grid;
+			place-items: center;
+			font-size: 14px;
+		}
+
+		.icon-button svg {
+			width: 15px;
+			height: 15px;
+			stroke: currentColor;
+			fill: none;
+			stroke-width: 2;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+		}
+
+		.copy-button {
+			color: var(--vscode-textLink-foreground);
+			border-color: rgba(80, 160, 255, 0.35);
+		}
+
+		.rename-button {
+			color: var(--vscode-charts-yellow);
+			border-color: rgba(235, 190, 80, 0.35);
+		}
+
+		.delete-button {
+			color: var(--vscode-errorForeground);
+			border-color: rgba(255, 100, 100, 0.45);
+		}
+
+		.regen-button {
+			color: var(--vscode-charts-green);
+			border-color: rgba(90, 200, 120, 0.35);
 		}
 
 		.ai-body {
 			overflow-y: auto;
-			padding: 22px 18px 14px;
+			padding: 22px 18px 96px;
 		}
 
 		.ai-empty {
@@ -396,7 +492,7 @@ export function buildPanelHtml(): string {
 
 		.message-content {
 			line-height: 1.55;
-			font-size: 13px;
+			font-size: 14px;
 		}
 
 		.message.user .message-content {
@@ -411,8 +507,57 @@ export function buildPanelHtml(): string {
 			padding: 4px 0;
 		}
 
+		.message-actions {
+			max-width: 820px;
+			margin: -8px auto 16px;
+			display: flex;
+			justify-content: flex-end;
+			gap: 6px;
+			opacity: 0.9;
+		}
+
+		.regenerate-actions {
+			justify-content: center;
+			margin-top: 8px;
+		}
+
+		.jump-bottom {
+			position: sticky;
+			bottom: 92px;
+			z-index: 15;
+			margin: 0 auto 10px;
+			border-radius: 999px;
+			background: var(--vscode-editorWidget-background);
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.24);
+		}
+
+		.jump-bottom[hidden] {
+			display: none;
+		}
+
+		.loading-row {
+			max-width: 820px;
+			margin: 4px auto 16px;
+			color: var(--vscode-descriptionForeground);
+		}
+
+		.loading-dot {
+			display: inline-block;
+			width: 7px;
+			height: 7px;
+			border-radius: 50%;
+			background: currentColor;
+			animation: pulse 900ms ease-in-out infinite alternate;
+		}
+
+		@keyframes pulse {
+			from { opacity: 0.25; transform: scale(0.8); }
+			to { opacity: 0.9; transform: scale(1.1); }
+		}
+
 		.message-content p {
 			margin: 0 0 10px;
+			font-size: 14px;
 		}
 
 		.message-content ul {
@@ -422,6 +567,7 @@ export function buildPanelHtml(): string {
 
 		.message-content li {
 			margin-bottom: 5px;
+			font-size: 14px;
 		}
 
 		.message-content code {
@@ -429,9 +575,45 @@ export function buildPanelHtml(): string {
 			background: var(--vscode-textCodeBlock-background, rgba(127,127,127,0.16));
 			border-radius: 4px;
 			padding: 1px 4px;
+			font-size: 13px;
+		}
+
+		.message-content h3 {
+			margin: 16px 0 8px;
+			font-size: 16px;
+		}
+
+		.message-content hr {
+			border: none;
+			border-top: 1px solid var(--vscode-panel-border);
+			margin: 14px 0;
+		}
+
+		.message-content table {
+			width: 100%;
+			border-collapse: collapse;
+			margin: 12px 0;
+			font-size: 12px;
+		}
+
+		.table-wrap {
+			margin: 12px 0;
+		}
+
+		.message-content th,
+		.message-content td {
+			border: 1px solid var(--vscode-panel-border);
+			padding: 7px 8px;
+			text-align: left;
+			vertical-align: top;
+		}
+
+		.message-content th {
+			background: var(--vscode-editorWidget-background);
 		}
 
 		.markdown-code {
+			position: relative;
 			background: var(--vscode-editor-background);
 			border: 1px solid var(--vscode-panel-border);
 			border-radius: 8px;
@@ -442,12 +624,34 @@ export function buildPanelHtml(): string {
 			font-size: 12px;
 		}
 
+		.code-language {
+			display: inline-block;
+			margin: -2px 0 10px;
+			padding: 2px 7px;
+			border-radius: 999px;
+			background: var(--vscode-badge-background);
+			color: var(--vscode-badge-foreground);
+			font-family: var(--vscode-font-family);
+			font-size: 11px;
+			user-select: none;
+			-webkit-user-select: none;
+		}
+
 		.markdown-code code {
+			display: block;
 			background: transparent;
 			padding: 0;
 		}
 
+		.copy-code {
+			float: right;
+			margin: -4px -4px 8px 8px;
+		}
+
 		.composer {
+			position: sticky;
+			bottom: 0;
+			z-index: 16;
 			padding: 12px 18px 16px;
 			border-top: 1px solid var(--vscode-panel-border);
 			background: var(--vscode-editor-background);
@@ -465,6 +669,71 @@ export function buildPanelHtml(): string {
 			background: var(--vscode-input-background);
 		}
 
+		.plus-menu {
+			position: relative;
+			align-self: flex-end;
+		}
+
+		.plus-menu summary {
+			list-style: none;
+			cursor: pointer;
+			width: 30px;
+			height: 30px;
+			display: grid;
+			place-items: center;
+			border: 1px solid var(--vscode-panel-border);
+			border-radius: 50%;
+			background: var(--vscode-button-secondaryBackground);
+		}
+
+		.plus-menu summary::-webkit-details-marker {
+			display: none;
+		}
+
+		.style-popover {
+			position: absolute;
+			bottom: calc(100% + 8px);
+			left: 0;
+			z-index: 12;
+			display: grid;
+			gap: 6px;
+			min-width: 130px;
+			padding: 8px;
+			border: 1px solid var(--vscode-panel-border);
+			border-radius: 10px;
+			background: var(--vscode-editorWidget-background);
+			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+		}
+
+		.style-chip {
+			align-self: flex-end;
+			padding: 5px 9px;
+			border-radius: 999px;
+			background: var(--vscode-badge-background);
+			color: var(--vscode-badge-foreground);
+			font-size: 12px;
+			border: none;
+		}
+
+		.slash-suggestions {
+			position: absolute;
+			left: 54px;
+			bottom: calc(100% + 8px);
+			z-index: 14;
+			display: grid;
+			gap: 6px;
+			min-width: 150px;
+			padding: 8px;
+			border: 1px solid var(--vscode-panel-border);
+			border-radius: 10px;
+			background: var(--vscode-editorWidget-background);
+			box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+		}
+
+		.slash-suggestions[hidden] {
+			display: none;
+		}
+
 		.composer-row textarea {
 			margin: 0;
 			min-height: 38px;
@@ -478,8 +747,12 @@ export function buildPanelHtml(): string {
 
 		.composer-row button {
 			border-radius: 9px;
-			min-width: 58px;
 			align-self: flex-end;
+		}
+
+		.send-button:disabled {
+			opacity: 0.45;
+			cursor: default;
 		}
 
 		.composer-hint {
@@ -518,12 +791,32 @@ export function buildPanelHtml(): string {
 			let chats = [];
 			let activeChat = null;
 			let responseStyle = localStorage.getItem('codeInsightsResponseStyle') ?? 'simple';
-			const faqQuestions = [
+			let aiSubtab = 'current';
+			let chatScope = localStorage.getItem('codeInsightsChatScope') ?? 'function';
+			let showFunctionContext = localStorage.getItem('codeInsightsShowFunctionContext') !== 'false';
+			let pendingUserMessage = '';
+			let stoppedRequest = false;
+			const responseStyles = ['simple', 'short', 'detailed', 'baby'];
+			const functionFaqQuestions = [
 				'Why is this function useful?',
 				'Does this mutate my data or return a new value?',
 				'What is a common mistake with this function?',
 				'Show me a simple example.'
 			];
+			const generalFaqQuestions = [
+				'Explain this concept more simply.',
+				'Give me a Python example.',
+				'What should I watch out for?',
+				'Compare the options in a table.'
+			];
+			const iconCopy = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="10" height="10" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+			const iconRename = '<svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>';
+			const iconTrash = '<svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M6 6l1 16h10l1-16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>';
+			const iconRefresh = '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.5 6.3"></path><path d="M3 12a9 9 0 0 1 15.5-6.3"></path><path d="M18 3v5h-5"></path><path d="M6 21v-5h5"></path></svg>';
+			const iconSend = '<svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg>';
+			const iconStop = '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
+			const iconContext = '<svg viewBox="0 0 24 24"><path d="M4 6h16"></path><path d="M4 12h10"></path><path d="M4 18h16"></path><path d="M17 10l3 2-3 2"></path></svg>';
+			const iconDown = '<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>';
 
 			function nav(mode) {
 				vscode.postMessage({ type: 'switch', mode });
@@ -546,11 +839,20 @@ export function buildPanelHtml(): string {
 
 				if (currentMode === 'ai') {
 					c.innerHTML = buildAi(currentEntry);
+					bindChatScrollState();
 					return;
 				}
 
 				c.innerHTML = buildLearn(currentEntry);
 			}
+
+			document.addEventListener('click', event => {
+				document.querySelectorAll('details[open].plus-menu').forEach(details => {
+					if (!details.contains(event.target)) {
+						details.removeAttribute('open');
+					}
+				});
+			});
 
 			function escapeHtml(value) {
 				return String(value ?? '')
@@ -644,8 +946,20 @@ export function buildPanelHtml(): string {
 					return;
 				}
 
+				const slashStyle = parseSlashStyle(question);
+				if (slashStyle && question === '/' + slashStyle) {
+					setResponseStyle(slashStyle);
+					if (input) {
+						input.value = '';
+					}
+					render();
+					return;
+				}
+
 				aiError = '';
 				aiLoading = true;
+				stoppedRequest = false;
+				pendingUserMessage = question;
 				if (input) {
 					input.value = '';
 				}
@@ -654,22 +968,30 @@ export function buildPanelHtml(): string {
 					type: 'askAi',
 					question,
 					chatId: activeChat?.id,
-					responseStyle
+					responseStyle,
+					chatScope
 				});
 			}
 
 			function askFaq(question) {
 				aiLoading = true;
 				aiError = '';
+				stoppedRequest = false;
+				pendingUserMessage = question;
+				aiSubtab = 'current';
 				render();
 				vscode.postMessage({
 					type: 'askFaq',
 					question,
-					responseStyle
+					responseStyle,
+					chatScope
 				});
 			}
 
 			function newChat(temporary) {
+				pendingUserMessage = '';
+				aiError = '';
+				aiSubtab = 'current';
 				vscode.postMessage({ type: 'newChat', temporary });
 			}
 
@@ -678,36 +1000,189 @@ export function buildPanelHtml(): string {
 			}
 
 			function deleteChat(chatId) {
-				const chat = chats.find(item => item.id === chatId);
-				const title = chat?.title ?? 'this chat';
-				if (confirm('Delete "' + title + '"? This cannot be undone.')) {
-					vscode.postMessage({ type: 'deleteChat', chatId });
-				}
+				vscode.postMessage({ type: 'deleteChat', chatId });
 			}
 
 			function renameChat(chatId) {
-				const title = prompt('Rename chat', activeChat?.title ?? 'New chat');
-				if (title !== null) {
-					vscode.postMessage({ type: 'renameChat', chatId, title });
-				}
+				vscode.postMessage({ type: 'renameChat', chatId });
 			}
 
 			function handleComposerKeydown(event) {
 				if (event.key === 'Enter' && !event.shiftKey) {
 					event.preventDefault();
+					const input = event.target;
+					const slashStyle = parseSlashStyle(input.value);
+					if (slashStyle) {
+						setResponseStyle(slashStyle);
+						input.value = '';
+						return;
+					}
 					sendQuestion();
 				}
 			}
 
 			function setResponseStyle(value) {
+				if (!responseStyles.includes(value)) {
+					return;
+				}
 				responseStyle = value;
 				localStorage.setItem('codeInsightsResponseStyle', value);
+				render();
+			}
+
+			function setAiSubtab(value) {
+				aiSubtab = value;
+				render();
+			}
+
+			function toggleChatScope() {
+				chatScope = chatScope === 'function' ? 'general' : 'function';
+				localStorage.setItem('codeInsightsChatScope', chatScope);
+				render();
+			}
+
+			function toggleFunctionContextLine() {
+				showFunctionContext = !showFunctionContext;
+				localStorage.setItem('codeInsightsShowFunctionContext', String(showFunctionContext));
+				render();
+			}
+
+			function regenerate() {
+				if (!activeChat || aiLoading) {
+					return;
+				}
+
+				aiError = '';
+				aiLoading = true;
+				stoppedRequest = false;
+				pendingUserMessage = '';
+				render();
+				vscode.postMessage({
+					type: 'regenerateAi',
+					chatId: activeChat.id,
+					responseStyle,
+					chatScope
+				});
+			}
+
+			function copyText(text) {
+				vscode.postMessage({ type: 'copyText', text: decodeCopyText(text) });
+			}
+
+			function decodeCopyText(text) {
+				try {
+					return decodeURIComponent(String(text ?? ''));
+				} catch {
+					return String(text ?? '');
+				}
+			}
+
+			function encodedText(value) {
+				return escapeJsString(encodeURIComponent(String(value ?? '')));
+			}
+
+			function scrollChatBottom() {
+				const body = document.querySelector('.ai-body');
+				if (body) {
+					body.scrollTop = body.scrollHeight;
+				}
+			}
+
+			function updateJumpBottom() {
+				const body = document.querySelector('.ai-body');
+				const button = document.getElementById('jump-bottom');
+				if (!body || !button) {
+					return;
+				}
+
+				const distanceFromBottom = body.scrollHeight - body.scrollTop - body.clientHeight;
+				button.hidden = distanceFromBottom < 80;
+			}
+
+			function bindChatScrollState() {
+				const body = document.querySelector('.ai-body');
+				if (!body) {
+					return;
+				}
+
+				body.removeEventListener('scroll', updateJumpBottom);
+				body.addEventListener('scroll', updateJumpBottom);
+				requestAnimationFrame(updateJumpBottom);
+			}
+
+			function stopResponse() {
+				stoppedRequest = true;
+				aiLoading = false;
+				pendingUserMessage = '';
+				render();
+			}
+
+			function handleComposerInput(event) {
+				const input = event.target;
+				const slashStyle = parseSlashStyle(input.value.trim());
+				if (slashStyle && /\\s$/.test(input.value)) {
+					setResponseStyle(slashStyle);
+					input.value = '';
+				}
+				updateSlashSuggestions(input.value);
+				const sendButton = document.getElementById('send-button');
+				if (sendButton && !aiLoading) {
+					sendButton.disabled = input.value.trim().length === 0;
+				}
+			}
+
+			function parseSlashStyle(value) {
+				const normalized = String(value ?? '').trim().toLowerCase();
+				if (!normalized.startsWith('/')) {
+					return '';
+				}
+
+				const style = normalized.slice(1);
+				return responseStyles.includes(style) ? style : '';
+			}
+
+			function matchingSlashStyles(value) {
+				const normalized = String(value ?? '').trim().toLowerCase();
+				if (!normalized.startsWith('/')) {
+					return [];
+				}
+
+				const query = normalized.slice(1);
+				return responseStyles.filter(style => style.startsWith(query));
+			}
+
+			function updateSlashSuggestions(value) {
+				const menu = document.getElementById('slash-suggestions');
+				if (!menu) {
+					return;
+				}
+
+				const matches = matchingSlashStyles(value);
+				menu.hidden = matches.length === 0;
+				menu.innerHTML = matches.map(style =>
+					'<button onclick="applySlashStyle(\\'' + style + '\\')">' + escapeHtml(style) + '</button>'
+				).join('');
+			}
+
+			function applySlashStyle(style) {
+				setResponseStyle(style);
+				const input = document.getElementById('ai-question');
+				if (input) {
+					input.value = '';
+					input.focus();
+				}
+				updateSlashSuggestions('');
 			}
 
 			function buildAi(entry) {
-				const visibleChats = chats.filter(chat => chat.functionKey === currentFunctionKey);
+				const visibleChats = chats.filter(chat => chat.functionKey === currentFunctionKey && !chat.id.startsWith('temp-'));
 				const messages = activeChat?.messages ?? [];
-				const hasStartedChat = messages.length > 0;
+				const displayMessages = pendingUserMessage
+					? [...messages, { role: 'user', content: pendingUserMessage, createdAt: '' }]
+					: messages;
+				const hasStartedChat = displayMessages.length > 0;
+				const activeTitle = activeChat?.id?.startsWith('temp-') ? 'Temporary chat' : activeChat?.title ?? 'New chat';
+				const faqQuestions = chatScope === 'function' ? functionFaqQuestions : generalFaqQuestions;
 				const faqMarkup = \`
 					<div class="faq-grid">
 						\${faqQuestions.map(question => \`
@@ -715,84 +1190,94 @@ export function buildPanelHtml(): string {
 						\`).join('')}
 					</div>
 				\`;
+				const historyMarkup = \`
+					<div class="history-view">
+						<div class="chat-actions">
+							<button class="primary-button" onclick="newChat(false); setAiSubtab('current')">New chat</button>
+							<button onclick="newChat(true); setAiSubtab('current')">Temporary chat</button>
+						</div>
+						\${visibleChats.length ? visibleChats.map(chat => \`
+							<div class="history-row \${activeChat?.id === chat.id ? 'active' : ''}">
+								<button class="history-title" title="\${escapeHtml(chat.title)}" onclick="selectChat('\${escapeJsString(chat.id)}'); setAiSubtab('current')">
+									\${escapeHtml(chat.title)}
+								</button>
+								<button class="icon-button rename-button" title="Rename chat" onclick="event.stopPropagation(); renameChat('\${escapeJsString(chat.id)}')">\${iconRename}</button>
+								<button class="icon-button delete-button" title="Delete chat" onclick="event.stopPropagation(); deleteChat('\${escapeJsString(chat.id)}')">\${iconTrash}</button>
+							</div>
+						\`).join('') : '<span class="notice">No chats yet.</span>'}
+					</div>
+				\`;
+				const currentChatMarkup = \`
+					\${hasStartedChat ? '' : \`
+						<div class="ai-empty">
+							<h3>How can I help with \${escapeHtml(entry.qualifiedName)}?</h3>
+							<p>\${chatScope === 'function' ? 'Ask about return values, mutation, side effects, examples, or mistakes.' : 'Ask anything. Function context is paused until you toggle it back on.'}</p>
+							\${faqMarkup}
+						</div>
+					\`}
+
+					<div class="messages">
+						\${displayMessages.map(message => \`
+							<div class="message \${message.role}">
+								<div class="message-role">\${message.role === 'user' ? 'You' : 'Code Insights'}</div>
+								<div class="message-content">\${renderMarkdown(message.content)}</div>
+							</div>
+							\${message.role === 'assistant' ? \`
+								<div class="message-actions">
+									<button class="icon-button copy-button" title="Copy response" onclick="copyText('\${encodedText(message.content)}')">\${iconCopy}</button>
+								</div>
+							\` : ''}
+						\`).join('')}
+					</div>
+
+					\${aiLoading ? '<div class="loading-row"><span class="loading-dot"></span></div>' : ''}
+					\${aiError ? '<div class="output-item">' + escapeHtml(aiError) + '</div>' : ''}
+					\${hasStartedChat && !aiLoading ? \`
+						<div class="message-actions regenerate-actions">
+							<button class="icon-button regen-button" title="Regenerate response" onclick="regenerate()">\${iconRefresh}</button>
+						</div>
+					\` : ''}
+					\${hasStartedChat ? \`
+						<button id="jump-bottom" class="icon-button jump-bottom" title="Jump to bottom" onclick="scrollChatBottom()" hidden>\${iconDown}</button>
+					\` : ''}
+				\`;
 
 				return \`
 					<div class="ai-shell">
 						<div class="ai-main">
-							<div class="ai-topbar">
-								<div class="ai-title">
-									<h2>Ask AI</h2>
-									<div class="ai-subtitle">Current function: \${escapeHtml(entry.qualifiedName)}</div>
-								</div>
-								<div class="ai-top-actions">
-									<details class="chat-menu">
-										<summary>Chats</summary>
-										<div class="chat-drawer-body">
-											<div class="chat-actions">
-												<button class="primary-button" onclick="newChat(false)">New chat</button>
-												<button onclick="newChat(true)">Temporary</button>
-											</div>
-											<div class="chat-list-title">Saved chats</div>
-											<div class="chat-items">
-												\${visibleChats.length ? visibleChats.map(chat => \`
-													<button class="chat-item \${activeChat?.id === chat.id ? 'active' : ''}" onclick="selectChat('\${escapeJsString(chat.id)}')">\${escapeHtml(chat.title)}\${chat.id.startsWith('temp-') ? ' (temp)' : ''}</button>
-												\`).join('') : '<span class="notice">No saved chats yet.</span>'}
-											</div>
-										</div>
-									</details>
-									<select class="response-style" onchange="setResponseStyle(this.value)">
-										<option value="simple" \${responseStyle === 'simple' ? 'selected' : ''}>Simple</option>
-										<option value="short" \${responseStyle === 'short' ? 'selected' : ''}>Short</option>
-										<option value="detailed" \${responseStyle === 'detailed' ? 'selected' : ''}>Detailed</option>
-										<option value="baby" \${responseStyle === 'baby' ? 'selected' : ''}>Baby</option>
-									</select>
-									\${hasStartedChat ? \`
-										<details class="faq-collapsed">
-											<summary>Suggested questions</summary>
-											\${faqMarkup}
-										</details>
-									\` : ''}
-									\${activeChat ? \`
-										<button title="Rename chat" onclick="renameChat('\${escapeJsString(activeChat.id)}')">Rename</button>
-										<button title="Delete chat" onclick="deleteChat('\${escapeJsString(activeChat.id)}')">Delete</button>
-									\` : ''}
-								</div>
+							<div class="ai-subtabs">
+								<button class="ai-subtab \${aiSubtab === 'chats' ? 'active' : ''}" onclick="setAiSubtab('chats')">Chats</button>
+								<button class="ai-subtab \${aiSubtab === 'current' ? 'active' : ''}" title="\${escapeHtml(activeTitle)}" onclick="setAiSubtab('current')">\${escapeHtml(activeTitle)}</button>
 							</div>
+							\${showFunctionContext ? \`
+								<div class="context-line">
+									<button class="ai-subtitle" title="Hide function name" onclick="toggleFunctionContextLine()">\${escapeHtml(entry.qualifiedName)}</button>
+								</div>
+							\` : ''}
 
 							<div class="ai-body">
-								\${hasStartedChat ? '' : \`
-									<div class="ai-empty">
-										<h3>How can I help with \${escapeHtml(entry.qualifiedName)}?</h3>
-										<p>Ask about return values, mutation, side effects, examples, or anything else you are unsure about.</p>
-										\${faqMarkup}
-									</div>
-								\`}
-
-								<div class="messages">
-									\${messages.map(message => \`
-										<div class="message \${message.role}">
-											<div class="message-role">\${message.role === 'user' ? 'You' : 'Code Insights'}</div>
-											<div class="message-content">\${renderMarkdown(message.content)}</div>
-										</div>
-									\`).join('')}
-								</div>
+								\${aiSubtab === 'chats' ? historyMarkup : currentChatMarkup}
 							</div>
 
 							<div class="composer">
 								<div class="composer-row">
-									<textarea id="ai-question" placeholder="Ask about this function or anything else..." onkeydown="handleComposerKeydown(event)"></textarea>
-									<button class="primary-button" onclick="sendQuestion()">\${aiLoading ? 'Sending...' : 'Send'}</button>
+									<details class="plus-menu">
+										<summary title="Response style">+</summary>
+										<div class="style-popover">
+											\${responseStyles.map(style => \`
+												<button class="\${responseStyle === style ? 'primary-button' : ''}" onclick="setResponseStyle('\${style}')">\${style}</button>
+											\`).join('')}
+										</div>
+									</details>
+									<span class="style-chip" title="Response style">\${escapeHtml(responseStyle)}</span>
+									<button class="scope-button icon-button \${chatScope === 'function' ? 'active' : ''}" title="Use selected function as context. Toggle off for general chat." onclick="toggleChatScope()">\${iconContext}</button>
+									<textarea id="ai-question" placeholder="\${chatScope === 'function' ? 'Ask about this function...' : 'Ask anything...'}" oninput="handleComposerInput(event)" onkeydown="handleComposerKeydown(event)"></textarea>
+									<div id="slash-suggestions" class="slash-suggestions" hidden></div>
+									<button id="send-button" class="primary-button icon-button send-button" title="\${aiLoading ? 'Stop' : 'Send'}" \${!aiLoading ? 'disabled' : ''} onclick="\${aiLoading ? 'stopResponse()' : 'sendQuestion()'}">\${aiLoading ? iconStop : iconSend}</button>
 								</div>
 							</div>
 						</div>
 					</div>
-
-					\${aiError ? \`
-						<div class="section">
-							<h3>Configuration or API Error</h3>
-							<div class="output-item">\${escapeHtml(aiError)}</div>
-						</div>
-					\` : ''}
 				\`;
 			}
 
@@ -809,32 +1294,120 @@ export function buildPanelHtml(): string {
 				const parts = String(markdown ?? '').split(new RegExp(fence + '([\\\\s\\\\S]*?)' + fence, 'g'));
 				return parts.map((part, index) => {
 					if (index % 2 === 1) {
-						return '<pre class="markdown-code"><code>' + escapeHtml(part.trim()) + '</code></pre>';
+						const fenceBlock = parseCodeFence(part);
+						const label = fenceBlock.language
+							? '<span class="code-language" aria-hidden="true">' + escapeHtml(fenceBlock.language) + '</span>'
+							: '';
+						return '<pre class="markdown-code"><button class="copy-code icon-button copy-button" title="Copy code" onclick="copyText(\\'' + encodedText(fenceBlock.code) + '\\')">' + iconCopy + '</button>' + label + '<code>' + escapeHtml(fenceBlock.code) + '</code></pre>';
 					}
 
 					return renderMarkdownText(part);
 				}).join('');
 			}
 
+			function parseCodeFence(content) {
+				const text = String(content ?? '').replace(/^\\n+|\\n+$/g, '');
+				const lines = text.split('\\n');
+				const firstLine = (lines[0] ?? '').trim();
+				const hasLanguage = /^[A-Za-z][\\w.+-]*$/.test(firstLine) && lines.length > 1;
+
+				return {
+					language: hasLanguage ? firstLine : '',
+					code: (hasLanguage ? lines.slice(1) : lines).join('\\n').trim()
+				};
+			}
+
 			function renderMarkdownText(text) {
 				const blocks = String(text ?? '').split(/\\n{2,}/);
 				return blocks.map(block => {
 					const lines = block.split('\\n');
+					if (/^\\s*-{3,}\\s*$/.test(block)) {
+						return '<hr />';
+					}
+
+					if (isMarkdownTable(lines)) {
+						return renderMarkdownTable(lines);
+					}
+
 					if (lines.every(line => /^\\s*[*-]\\s+/.test(line))) {
 						return '<ul>' + lines.map(line =>
 							'<li>' + formatInline(line.replace(/^\\s*[*-]\\s+/, '')) + '</li>'
 						).join('') + '</ul>';
 					}
 
+					if (lines.some(line => /^\\s*[*-]\\s+/.test(line))) {
+						return renderMixedMarkdownLines(lines);
+					}
+
+					if (lines.length === 1 && /^#{1,3}\\s+/.test(lines[0])) {
+						return '<h3>' + formatInline(lines[0].replace(/^#{1,3}\\s+/, '')) + '</h3>';
+					}
+
 					return '<p>' + formatInline(block).replace(/\\n/g, '<br />') + '</p>';
 				}).join('');
+			}
+
+			function renderMixedMarkdownLines(lines) {
+				const html = [];
+				let paragraph = [];
+				let bullets = [];
+
+				function flushParagraph() {
+					if (paragraph.length) {
+						html.push('<p>' + formatInline(paragraph.join('\\n')).replace(/\\n/g, '<br />') + '</p>');
+						paragraph = [];
+					}
+				}
+
+				function flushBullets() {
+					if (bullets.length) {
+						html.push('<ul>' + bullets.map(item => '<li>' + formatInline(item) + '</li>').join('') + '</ul>');
+						bullets = [];
+					}
+				}
+
+				lines.forEach(line => {
+					if (/^\\s*[*-]\\s+/.test(line)) {
+						flushParagraph();
+						bullets.push(line.replace(/^\\s*[*-]\\s+/, ''));
+						return;
+					}
+
+					flushBullets();
+					paragraph.push(line);
+				});
+
+				flushParagraph();
+				flushBullets();
+				return html.join('');
 			}
 
 			function formatInline(text) {
 				const tick = String.fromCharCode(96);
 				return escapeHtml(text)
 					.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')
+					.replace(/(^|[^*])\\*([^*]+)\\*/g, '$1<em>$2</em>')
 					.replace(new RegExp(tick + '([^' + tick + ']+)' + tick, 'g'), '<code>$1</code>');
+			}
+
+			function isMarkdownTable(lines) {
+				return lines.length >= 2 &&
+					lines[0].includes('|') &&
+					/^\\s*\\|?\\s*:?-{3,}:?\\s*(\\|\\s*:?-{3,}:?\\s*)+\\|?\\s*$/.test(lines[1]);
+			}
+
+			function renderMarkdownTable(lines) {
+				const rows = lines
+					.filter(line => line.includes('|'))
+					.map(line => line.trim().replace(/^\\|/, '').replace(/\\|$/, '').split('|').map(cell => cell.trim()));
+				const header = rows[0] ?? [];
+				const body = rows.slice(2);
+
+				return '<table><thead><tr>' +
+					header.map(cell => '<th>' + formatInline(cell) + '</th>').join('') +
+					'</tr></thead><tbody>' +
+					body.map(row => '<tr>' + row.map(cell => '<td>' + formatInline(cell) + '</td>').join('') + '</tr>').join('') +
+					'</tbody></table>';
 			}
 
 			window.addEventListener('message', e => {
@@ -846,28 +1419,38 @@ export function buildPanelHtml(): string {
 					currentFunctionKey = msg.functionKey;
 					aiError = '';
 					aiLoading = false;
+					pendingUserMessage = '';
 					chats = msg.chats ?? chats;
 					activeChat = msg.activeChat ?? activeChat;
 					render();
+					bindChatScrollState();
 				}
 
 				if (msg.type === 'activate') {
 					currentMode = msg.mode;
 					render();
+					bindChatScrollState();
 				}
 
 				if (msg.type === 'aiResult') {
+					if (stoppedRequest) {
+						return;
+					}
 					aiError = '';
 					aiLoading = false;
+					pendingUserMessage = '';
 					chats = msg.chats ?? chats;
 					activeChat = msg.activeChat ?? activeChat;
 					render();
+					bindChatScrollState();
 				}
 
 				if (msg.type === 'aiError') {
 					aiError = msg.message;
 					aiLoading = false;
+					pendingUserMessage = '';
 					render();
+					bindChatScrollState();
 				}
 
 				if (msg.type === 'aiState') {
@@ -875,7 +1458,9 @@ export function buildPanelHtml(): string {
 					activeChat = msg.activeChat ?? null;
 					aiError = '';
 					aiLoading = false;
+					pendingUserMessage = '';
 					render();
+					bindChatScrollState();
 				}
 			});
 
@@ -935,9 +1520,12 @@ export function openPanel(
 			if (msg?.type === 'askAi') {
 				try {
 					const chat = ensureChat(String(msg.chatId ?? ''), activeFunctionKey ?? functionKey, false);
-					chatStore?.addMessage(chat.id, createMessage('user', String(msg.question ?? '')));
+					const question = String(msg.question ?? '');
+					chatStore?.addMessage(chat.id, createMessage('user', question));
 					const currentChat = chatStore?.getChat(chat.id) ?? chat;
-					const answer = await askInsightAi(context, activeEntry ?? entry, currentChat.messages, String(msg.responseStyle ?? 'simple'));
+					const titlePromise = maybeGenerateChatTitle(context, chat.id, question);
+					const answer = await askInsightAi(context, activeEntry ?? entry, currentChat.messages, String(msg.responseStyle ?? 'simple'), String(msg.chatScope ?? 'function'));
+					await titlePromise;
 					const updatedChat = chatStore?.addMessage(chat.id, createMessage('assistant', answer)) ?? currentChat;
 					panel?.webview.postMessage({
 						type: 'aiResult',
@@ -957,8 +1545,30 @@ export function openPanel(
 					if (!chat) { throw new Error('Chat store is not available.'); }
 					chatStore?.addMessage(chat.id, createMessage('user', question));
 					const currentChat = chatStore?.getChat(chat.id) ?? chat;
-					const answer = await askInsightAi(context, activeEntry ?? entry, currentChat.messages, String(msg.responseStyle ?? 'simple'));
+					const titlePromise = maybeGenerateChatTitle(context, chat.id, question);
+					const answer = await askInsightAi(context, activeEntry ?? entry, currentChat.messages, String(msg.responseStyle ?? 'simple'), String(msg.chatScope ?? 'function'));
+					await titlePromise;
 					const updatedChat = chatStore?.addMessage(chat.id, createMessage('assistant', answer)) ?? currentChat;
+					panel?.webview.postMessage({
+						type: 'aiResult',
+						chats: chatStore?.listChats() ?? [],
+						activeChat: updatedChat
+					});
+				} catch (error) {
+					const message = error instanceof Error ? error.message : 'AI request failed.';
+					panel?.webview.postMessage({ type: 'aiError', message });
+				}
+			}
+
+			if (msg?.type === 'regenerateAi') {
+				try {
+					const chatId = String(msg.chatId ?? '');
+					const chat = chatStore?.removeLastAssistantMessage(chatId);
+					if (!chat || !chat.messages.some(message => message.role === 'user')) {
+						throw new Error('There is no user message to regenerate from.');
+					}
+					const answer = await askInsightAi(context, activeEntry ?? entry, chat.messages, String(msg.responseStyle ?? 'simple'), String(msg.chatScope ?? 'function'));
+					const updatedChat = chatStore?.addMessage(chat.id, createMessage('assistant', answer)) ?? chat;
 					panel?.webview.postMessage({
 						type: 'aiResult',
 						chats: chatStore?.listChats() ?? [],
@@ -982,25 +1592,56 @@ export function openPanel(
 
 			if (msg?.type === 'selectChat') {
 				const chatId = String(msg.chatId ?? '');
-				const selectedChat = chatStore?.getChat(chatId);
-				if (selectedChat && !selectedChat.id.startsWith('temp-')) {
-					chatStore?.clearTemporaryChats();
-				}
 				postAiState(activeFunctionKey ?? functionKey, chatId);
 			}
 
 			if (msg?.type === 'deleteChat') {
-				chatStore?.deleteChat(String(msg.chatId ?? ''));
-				postAiState(activeFunctionKey ?? functionKey);
-			}
+				const chatId = String(msg.chatId ?? '');
+				const chat = chatStore?.getChat(chatId);
+				const title = chat?.title ?? 'this chat';
+				const confirmed = await vscode.window.showWarningMessage(
+					`Delete "${title}"? This cannot be undone.`,
+					{ modal: true },
+					'Delete'
+				);
+				if (confirmed !== 'Delete') {
+					return;
+				}
 
-			if (msg?.type === 'renameChat') {
-				const chat = chatStore?.renameChat(String(msg.chatId ?? ''), String(msg.title ?? ''));
+				chatStore?.deleteChat(chatId);
+				const remainingChat = chatStore?.listChats().find(chat =>
+					chat.functionKey === (activeFunctionKey ?? functionKey) && !chat.id.startsWith('temp-')
+				);
 				panel?.webview.postMessage({
 					type: 'aiState',
 					chats: chatStore?.listChats() ?? [],
-					activeChat: chat
+					activeChat: remainingChat
 				});
+			}
+
+			if (msg?.type === 'renameChat') {
+				const chatId = String(msg.chatId ?? '');
+				const chat = chatStore?.getChat(chatId);
+				const title = await vscode.window.showInputBox({
+					title: 'Rename chat',
+					value: chat?.title ?? 'New chat',
+					ignoreFocusOut: true
+				});
+				if (title === undefined) {
+					return;
+				}
+
+				chatStore?.renameChat(chatId, title);
+				panel?.webview.postMessage({
+					type: 'aiState',
+					chats: chatStore?.listChats() ?? [],
+					activeChat: pickActiveChat(activeFunctionKey ?? functionKey, chatId)
+				});
+			}
+
+			if (msg?.type === 'copyText') {
+				await vscode.env.clipboard.writeText(String(msg.text ?? ''));
+				void vscode.window.setStatusBarMessage('Code Insights: copied', 1500);
 			}
 		});
 	}
@@ -1038,6 +1679,29 @@ function postAiState(functionKey: string, chatId?: string): void {
 		chats: chatStore?.listChats() ?? [],
 		activeChat: pickActiveChat(functionKey, chatId)
 	});
+}
+
+async function maybeGenerateChatTitle(
+	context: vscode.ExtensionContext,
+	chatId: string,
+	firstMessage: string
+): Promise<void> {
+	const chat = chatStore?.getChat(chatId);
+	if (
+		!chat ||
+		chat.id.startsWith('temp-') ||
+		chat.messages.filter(message => message.role === 'user').length !== 1 ||
+		chat.messages.some(message => message.role === 'assistant')
+	) {
+		return;
+	}
+
+	try {
+		const title = await suggestChatTitle(context, firstMessage);
+		chatStore?.renameChat(chatId, title);
+	} catch {
+		// Keep the local fallback title if the title request fails.
+	}
 }
 
 function missingChatStore(): never {

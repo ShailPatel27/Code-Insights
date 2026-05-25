@@ -120,18 +120,22 @@ Ask AI includes:
 * selectable and deletable chats
 * temporary chats that are not saved to disk
 * automatic cleanup of saved chats after 30 days
-* Enter to send and Shift+Enter for a new line
-* styled responses with fenced code block rendering
+* simple, short, detailed, and beginner-friendly response styles
+* function-context toggle for focused or general questions
+* copyable responses and code blocks
+* styled Markdown responses with code blocks and responsive tables
 
 The extension reads API keys and model choices from `.env` in your opened workspace, or from the extension folder during local development. Keys stay in the extension host and are not exposed to the webview.
+
+Multiple keys can be provided as comma-separated fallbacks. If one key fails or hits a limit, Code Insights tries the next key.
 
 Example `.env`:
 
 ```env
 CODE_INSIGHTS_AI_PROVIDER=openai
 CODE_INSIGHTS_AI_MODEL=gpt-4.1-mini
-OPENAI_API_KEY=your_openai_key
-GEMINI_API_KEY=your_gemini_key
+OPENAI_API_KEY=your_openai_key,your_backup_openai_key
+GEMINI_API_KEY=your_gemini_key,your_backup_gemini_key
 GEMINI_MODEL=gemini-2.5-flash
 ```
 

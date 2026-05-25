@@ -121,6 +121,33 @@ export class ChatStore {
 		this.writeDb(db);
 	}
 
+	removeLastAssistantMessage(chatId: string): SavedChat {
+		const temporary = this.temporaryChats.get(chatId);
+		if (temporary) {
+			const index = findLastAssistantIndex(temporary.messages);
+			if (index !== -1) {
+				temporary.messages.splice(index, 1);
+				temporary.updatedAt = new Date().toISOString();
+			}
+			return temporary;
+		}
+
+		const db = this.readDb();
+		const chat = db.chats.find(item => item.id === chatId);
+		if (!chat) {
+			throw new Error('Chat not found.');
+		}
+
+		const index = findLastAssistantIndex(chat.messages);
+		if (index !== -1) {
+			chat.messages.splice(index, 1);
+			chat.updatedAt = new Date().toISOString();
+			this.writeDb(db);
+		}
+
+		return chat;
+	}
+
 	clearTemporaryChats(): void {
 		this.temporaryChats.clear();
 	}
@@ -147,6 +174,16 @@ export class ChatStore {
 		fs.mkdirSync(this.context.globalStorageUri.fsPath, { recursive: true });
 		fs.writeFileSync(this.dbPath, JSON.stringify(db, null, 2));
 	}
+}
+
+function findLastAssistantIndex(messages: ChatMessage[]): number {
+	for (let index = messages.length - 1; index >= 0; index -= 1) {
+		if (messages[index].role === 'assistant') {
+			return index;
+		}
+	}
+
+	return -1;
 }
 
 export function createMessage(role: ChatMessage['role'], content: string): ChatMessage {
