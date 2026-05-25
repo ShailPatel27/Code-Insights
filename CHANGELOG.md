@@ -4,7 +4,7 @@ All notable changes to the "code-insights" extension will be documented in this 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [0.4.0] - 2026-05-14
+## [0.4.0] - 2026-05-25
 
 - Added the guided static Test tab with curated code samples, explanations, and expected behavior.
 - Added Python built-in insights for `sorted`, `len`, and `list.sort`.
