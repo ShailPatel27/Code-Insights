@@ -2,12 +2,22 @@
   "name": "code-insights",
   "displayName": "Code Insights",
   "description": "Show insights about what Python code does",
-  "version": "0.1.0",
+  "version": "0.4.0",
+  "icon": "images/logo-without-text-without-background.png",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.107.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "python",
+    "numpy",
+    "ai",
+    "learning",
+    "debugging",
+    "code insights",
+    "developer tools"
   ],
   "activationEvents": [
     "onLanguage:python"
@@ -23,14 +33,15 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "mocha \"out/test/**/*.test.js\"",
+    "test:vscode": "vscode-test"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/ShailPatel27/Code-Insights"
   },
   "homepage": "https://github.com/ShailPatel27/Code-Insights",
-  "publisher": "shailpatel",
+  "publisher": "Lenex",
 
   "devDependencies": {
     "@types/vscode": "^1.107.0",
